@@ -10,29 +10,18 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      /* === PALETA (print preto ciano/rosa) === */
-      --bg: #0a0a0a;
-      --panel: #111111;
-      --soft: #161616;
-      --ink: #f5f7ff;
-      --muted: #a9b0c2;
-      --ring1: #00d1ff;
-      --ring2: #ff2e88;
-      --primary: #00d1ff;
-      --accent: #ff2e88;
-      --ok: #37d399;
-      --warn: #fec84b;
-      --danger: #f43f5e;
-      --card-radius: 18px;
-      --shadow: 0 10px 40px rgba(0,0,0,.45);
+      --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2;
+      --ring1:#00d1ff; --ring2:#ff2e88; --primary:#00d1ff; --accent:#ff2e88;
+      --ok:#37d399; --warn:#fec84b; --danger:#f43f5e; --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
-                  radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
-                  var(--bg);
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+        radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
+        var(--bg);
       color:var(--ink);
     }
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
@@ -44,10 +33,9 @@
     .btn:hover{filter:brightness(1.08)}
     select{appearance:none}
 
-    /* NAV de MÓDULOS */
     .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
-    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer}
-    .mod:hover{transform:translateY(-2px);transition:.2s ease;filter:brightness(1.02)}
+    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .2s ease, filter .2s ease}
+    .mod:hover{transform:translateY(-2px);filter:brightness(1.02)}
     .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
     .mod .desc{color:var(--muted);font-size:12px}
     .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
@@ -57,7 +45,6 @@
     .chip{display:inline-flex;align-items:center;gap:6px;background:#0f0f0f;border:1px solid #1e1e1e;padding:6px 10px;border-radius:999px;font-size:12px}
     .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
 
-    /* KPI GRID secundário */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
     .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
     .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
@@ -65,18 +52,17 @@
     .kpi-value{font-size:28px;font-weight:700}
     .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
 
-    /* CHARTS maiores */
     .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
     .chart-card{padding:18px}
     canvas{width:100%;height:100%}
 
-    /* ==== MODAL (popup grande) ==== */
+    /* Modal */
     .modal-backdrop{
       position:fixed; inset:0; display:none; place-items:center;
       background:rgba(0,0,0,.55); backdrop-filter:saturate(110%) blur(4px);
       z-index:999;
     }
-    .modal-backdrop.show{ display:grid; animation:fadeIn .18s ease-out }
+    .modal-backdrop.show{ display:grid !important; animation:fadeIn .18s ease-out }
     @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
     .modal{
@@ -144,7 +130,7 @@
       </div>
     </header>
 
-    <!-- ===== MÓDULOS ===== -->
+    <!-- Módulos -->
     <section class="modules">
       <a class="mod" data-mod="METAS" id="link-metas" href="#">
         <span class="badge">Metas</span>
@@ -212,7 +198,7 @@
       </a>
     </section>
 
-    <!-- KPIs gerais (exemplo) -->
+    <!-- KPIs gerais -->
     <section class="grid">
       <div class="card">
         <h3>Período</h3>
@@ -228,7 +214,7 @@
       </div>
     </section>
 
-    <!-- CHARTS maiores (visual) -->
+    <!-- CHARTS -->
     <section class="charts">
       <div class="card chart-card">
         <h3>Timeline geral</h3>
@@ -243,9 +229,9 @@
     <div class="subtitle" style="margin-top:16px">
       Última atualização: <span id="last-update">—</span>
     </div>
+  </div> <!-- FECHA .wrap ANTES DO MODAL -->
 
-
-  <!-- ===== MODAL UNIVERSAL DOS MÓDULOS ===== -->
+  <!-- Modal universal -->
   <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <header>
@@ -290,10 +276,10 @@
   </div>
 
 <script>
-/**************** CONFIG ****************/
+/* ========= CONFIG ========= */
 const CONFIG = {
   LINKS: {
-    METAS: 'index.meta.html',
+    METAS: 'metas/index.html',
     CANCELAMENTOS: 'cancelamentos/index.html',
     TRAVAS: 'travas/index.html',
     FINANCEIRO: 'resumo-financeiro/index.html',
@@ -303,9 +289,10 @@ const CONFIG = {
     MIDIAS: 'midias/index.html'
   },
   APIS: {
-    METAS: 'https://script.google.com/macros/s/AKfycbziCPWWJxxfrnSeT3RHsNbw21z9MfnnB8JpV7ZQcZnvUQQ7dL3lVJdpUG7epACVjFaO/exec',
-    CANCELAMENTOS: 'https://script.google.com/macros/s/AKfycbzM1mmixFkFE5tbC-0Evc6GVyZEJkh88HCikNK08FujRwCrgUA1e_E29nMHip81kRPoSg/exec',
-    PESQUISA: 'https://script.google.com/macros/s/AKfycbyK3A5CDn_EgA3pbRVToh87_qKWvbIry886OkR1AdkJi7RyvSgcwY0BmRqhbKQnEKwgrA/exec',
+    // pode deixar vazio por enquanto; os adapters fazem fallback
+    METAS: '',            // ex.: 'https://.../exec'
+    CANCELAMENTOS: '',
+    PESQUISA: '',
     TRAVAS: '',
     FINANCEIRO: '',
     DELIVERY: '',
@@ -317,8 +304,8 @@ const CONFIG = {
 const $ = s => document.querySelector(s);
 const fmt = new Intl.NumberFormat('pt-BR', {maximumFractionDigits:0});
 
-/**************** CHART HELPERS ****************/
-function spark(el, data, color='#00d1ff'){
+/* ========= CHART HELPERS ========= */
+function spark(el, data){
   const ctx = document.getElementById(el);
   const g = ctx.getContext('2d').createLinearGradient(0,0,0,60);
   g.addColorStop(0, 'rgba(0,209,255,.35)');
@@ -335,7 +322,7 @@ function makeBar(ctx){
   return new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Eventos',data:[],backgroundColor:'#00d1ff'}]},options:{scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}}});
 }
 
-/**************** FETCH HELPERS ****************/
+/* ========= FETCH HELPERS (com fallback seguro) ========= */
 function buildUrl(base, empresa, periodo){
   if(!base) return '';
   const u = new URL(base);
@@ -349,10 +336,10 @@ async function fetchJSON(url){
   return r.json();
 }
 
-/**************** ADAPTERS (transformam APIs) ****************/
+/* ========= ADAPTERS ========= */
 const adapters = {
   metas: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.METAS) return null;
+    if(!CONFIG.APIS.METAS) return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
     const data = await fetchJSON(buildUrl(CONFIG.APIS.METAS, empresa, periodo));
     const meta = data.meta ?? data.META ?? 0;
     const real = data.realizado ?? data.REAL ?? 0;
@@ -361,54 +348,35 @@ const adapters = {
     return { kpi: progresso+"%", spark: serie.slice(-12), kpis:{a:progresso+"%", b:"Meta R$ "+(meta||0).toLocaleString('pt-BR'), c:"Real R$ "+(real||0).toLocaleString('pt-BR'), d:(data.deltaMM ?? '—')} };
   },
   cancel: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.CANCELAMENTOS) return null;
+    if(!CONFIG.APIS.CANCELAMENTOS) return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
     const data = await fetchJSON(buildUrl(CONFIG.APIS.CANCELAMENTOS, empresa, periodo));
     let total = data.total_cancelado ?? 0;
     if(Array.isArray(data)) total = data.reduce((s,it)=> s + (Number(it.valor)||0), 0);
     const serie = data.serie ?? (data.timeline || []);
     return { kpi: 'R$ '+ total.toLocaleString('pt-BR'), spark: serie.slice(-12), kpis:{a:'R$ '+total.toLocaleString('pt-BR'), b:(data.itens||'—')+' itens', c:(data.rate||'—')+'%', d:(data.deltaMM ?? '—')} };
   },
-  travas: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.TRAVAS) return null;
-    const data = await fetchJSON(buildUrl(CONFIG.APIS.TRAVAS, empresa, periodo));
-    const v = data.comprado ?? 0; const serie = data.serie || [];
-    return { kpi: 'R$ '+ v.toLocaleString('pt-BR'), spark: serie.slice(-12), kpis:{a:'R$ '+v.toLocaleString('pt-BR'), b:'Planos válidos: '+(data.validos??'—'), c:'Já compr.: '+(data.jaComprado??'—'), d:(data.deltaMM ?? '—')} };
+  travas: async ()=>{
+    return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
   },
-  financeiro: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.FINANCEIRO) return null;
-    const d = await fetchJSON(buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo));
-    const saldo = (d.entradas||0) - (d.saidas||0);
-    const serie = d.serie || [];
-    return { kpi: 'R$ '+ saldo.toLocaleString('pt-BR'), spark: serie.slice(-12), kpis:{a:'R$ '+(d.entradas||0).toLocaleString('pt-BR'), b:'R$ '+(d.saidas||0).toLocaleString('pt-BR'), c:'Saldo R$ '+saldo.toLocaleString('pt-BR'), d:(d.deltaMM ?? '—')} };
+  financeiro: async ()=>{
+    return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
   },
-  delivery: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.DELIVERY) return null;
-    const d = await fetchJSON(buildUrl(CONFIG.APIS.DELIVERY, empresa, periodo));
-    const receita = d.total ?? d.receita ?? 0;
-    const serie = d.serie || [];
-    return { kpi: 'R$ '+ receita.toLocaleString('pt-BR'), spark: serie.slice(-12), kpis:{a:'Pedidos: '+(d.pedidos??'—'), b:'Ticket: R$ '+(d.ticket??'—'), c:'Receita: R$ '+receita.toLocaleString('pt-BR'), d:(d.deltaMM ?? '—')} };
+  delivery: async ()=>{
+    return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
   },
-  conciliacao: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.CONCILIACAO) return null;
-    const d = await fetchJSON(buildUrl(CONFIG.APIS.CONCILIACAO, empresa, periodo));
-    const pend = d.pendencias ?? 0; const serie = d.serie || [];
-    return { kpi: pend+' pend.', spark: serie.slice(-12), kpis:{a:pend+' pendências', b:'Conferidos: '+(d.conferidos??'—'), c:'Bancos: '+(d.bancos??'—'), d:(d.deltaMM ?? '—')} };
+  conciliacao: async ()=>{
+    return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
   },
-  nps: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.PESQUISA) return null;
-    const d = await fetchJSON(buildUrl(CONFIG.APIS.PESQUISA, empresa, periodo));
-    const nps = d.nps ?? d.NPS ?? 0; const serie = d.serie || [];
-    return { kpi: 'NPS '+ nps, spark: serie.slice(-12), kpis:{a:'NPS '+nps, b:'Promotores: '+(d.promotores??'—'), c:'Detratores: '+(d.detratores??'—'), d:(d.deltaMM ?? '—')} };
+  nps: async ()=>{
+    return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
   },
-  midias: async (empresa,periodo)=>{
-    if(!CONFIG.APIS.MIDIAS) return null;
-    const d = await fetchJSON(buildUrl(CONFIG.APIS.MIDIAS, empresa, periodo));
-    const views = d.views ?? 0; const serie = d.serie || [];
-    return { kpi: fmt.format(views), spark: serie.slice(-12), kpis:{a:'Views: '+fmt.format(views), b:'Engaj.: '+(d.engaj??'—'), c:'Novos seg.: '+(d.seguidores??'—'), d:(d.deltaMM ?? '—')} };
+  midias: async ()=>{
+    return {kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}};
   }
 };
+function demoSeries(){ return Array.from({length:12},()=>Math.round(100+Math.random()*300)); }
 
-/**************** RENDER DO DASHBOARD ****************/
+/* ========= RENDER ========= */
 let chartLine, chartBar, sparks = {};
 function setLinks(){
   $('#link-metas').dataset.href  = CONFIG.LINKS.METAS;
@@ -420,13 +388,11 @@ function setLinks(){
   $('#link-nps').dataset.href    = CONFIG.LINKS.PESQUISA;
   $('#link-midias').dataset.href = CONFIG.LINKS.MIDIAS;
 }
-
 function renderModule(idKpi, idSpark, payload){
   if(!payload) return;
   $(idKpi).textContent = payload.kpi || '—';
   if(payload.spark && payload.spark.length){ sparks[idSpark] = spark(idSpark, payload.spark); }
 }
-
 async function loadModules(){
   const emp = $('#empresa').value;
   const per = $('#periodo').value;
@@ -445,11 +411,9 @@ async function loadModules(){
   if(n) renderModule('#kpi-nps','spark-nps', n);
   if(mi) renderModule('#kpi-views','spark-views', mi);
 }
-
 function bootstrapCharts(){
   chartLine = makeLine($('#line-timeline'));
   chartBar  = makeBar($('#bar-days'));
-  // placeholders
   chartLine.data.labels = ['S1','S2','S3','S4','S5','S6','S7'];
   chartLine.data.datasets[0].data = [180,220,260,300,450,200,150];
   chartLine.data.datasets[1].data = [60,120,180,250,380,150,90];
@@ -459,9 +423,8 @@ function bootstrapCharts(){
   chartBar.update();
 }
 
-/**************** MODAL UNIVERSAL ****************/
+/* ========= MODAL ========= */
 let MODAL = { line:null, bar:null, currentKey:null };
-
 function openModal(modKey, title, fullHref){
   const $b = $('#modal-backdrop');
   $('#modal-title').textContent = title;
@@ -484,23 +447,21 @@ function openModal(modKey, title, fullHref){
     });
   }
   MODAL.currentKey = modKey;
+
   $b.classList.add('show');
   $b.setAttribute('aria-hidden','false');
   loadModalData(); // carrega conteúdo
 }
-
 function closeModal(){
   const $b = $('#modal-backdrop');
   $b.classList.remove('show');
   $b.setAttribute('aria-hidden','true');
 }
-
 async function loadModalData(){
   const empresa = $('#modal-empresa').value;
   const periodo = $('#modal-periodo').value;
   const key = MODAL.currentKey;
 
-  // escolhe adapter
   const map = {
     METAS: adapters.metas,
     CANCELAMENTOS: adapters.cancel,
@@ -512,51 +473,29 @@ async function loadModalData(){
     MIDIAS: adapters.midias
   };
   let payload = null;
-
   try{
     if(map[key]) payload = await map[key](empresa,periodo);
-  }catch(e){
-    // placeholder se API não existir ainda
-    payload = null;
-  }
+  }catch(e){ payload = null; }
 
-  // KPIs + gráficos do modal
   const kpiA = $('#kpi-a'), kpiB=$('#kpi-b'), kpiC=$('#kpi-c'), kpiD=$('#kpi-d');
-  if(payload){
-    const series = payload.spark?.length ? payload.spark : Array.from({length:12},(_,i)=>Math.round(100+Math.random()*300));
-    const labels = series.map((_,i)=>'P'+(i+1));
-    MODAL.line.data.labels = labels;
-    MODAL.line.data.datasets[0].data = series;
-    MODAL.line.update();
+  const series = payload?.spark?.length ? payload.spark : demoSeries();
+  const labels = series.map((_,i)=>'P'+(i+1));
 
-    MODAL.bar.data.labels = ['A','B','C','D','E','F'];
-    MODAL.bar.data.datasets[0].data = Array.from({length:6},()=>Math.round(10+Math.random()*40));
-    MODAL.bar.update();
+  MODAL.line.data.labels = labels;
+  MODAL.line.data.datasets[0].data = series;
+  MODAL.line.update();
 
-    kpiA.textContent = payload.kpis?.a ?? payload.kpi ?? '—';
-    kpiB.textContent = payload.kpis?.b ?? '—';
-    kpiC.textContent = payload.kpis?.c ?? '—';
-    kpiD.textContent = payload.kpis?.d ?? '—';
-  } else {
-    // fallback visual
-    const series = Array.from({length:12},(_,i)=>Math.round(100+Math.random()*300));
-    const labels = series.map((_,i)=>'P'+(i+1));
-    MODAL.line.data.labels = labels;
-    MODAL.line.data.datasets[0].data = series;
-    MODAL.line.update();
+  MODAL.bar.data.labels = ['A','B','C','D','E','F'];
+  MODAL.bar.data.datasets[0].data = Array.from({length:6},()=>Math.round(10+Math.random()*40));
+  MODAL.bar.update();
 
-    MODAL.bar.data.labels = ['A','B','C','D','E','F'];
-    MODAL.bar.data.datasets[0].data = Array.from({length:6},()=>Math.round(10+Math.random()*40));
-    MODAL.bar.update();
-
-    kpiA.textContent = '—';
-    kpiB.textContent = '—';
-    kpiC.textContent = '—';
-    kpiD.textContent = '—';
-  }
+  kpiA.textContent = payload?.kpis?.a ?? payload?.kpi ?? '—';
+  kpiB.textContent = payload?.kpis?.b ?? '—';
+  kpiC.textContent = payload?.kpis?.c ?? '—';
+  kpiD.textContent = payload?.kpis?.d ?? '—';
 }
 
-/**************** BOOTSTRAP ****************/
+/* ========= BOOTSTRAP ========= */
 window.addEventListener('DOMContentLoaded', ()=>{
   setLinks();
   $('#periodo').value = new Date().toISOString().slice(0,7);
@@ -568,7 +507,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
   bootstrapCharts();
   loadModules();
 
-  // click nos módulos -> abre modal
+  // abre modal ao clicar nos módulos
   document.querySelectorAll('.mod').forEach(el=>{
     el.addEventListener('click', (e)=>{
       e.preventDefault();
@@ -579,7 +518,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     });
   });
 
-  // filtros gerais recarregam módulos
+  // filtros gerais
   $('#btn-refresh').addEventListener('click', loadModules);
   $('#empresa').addEventListener('change', loadModules);
   $('#periodo').addEventListener('change', ()=>{
@@ -587,12 +526,12 @@ window.addEventListener('DOMContentLoaded', ()=>{
     loadModules();
   });
 
-  // modal: eventos
+  // modal: fechar
   $('#modal-close').addEventListener('click', closeModal);
   $('#modal-backdrop').addEventListener('click', (e)=>{ if(e.target.id==='modal-backdrop') closeModal(); });
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
 
-  // filtros do modal recarregam conteúdo
+  // filtros do modal
   $('#modal-empresa').addEventListener('change', loadModalData);
   $('#modal-periodo').addEventListener('change', loadModalData);
 });
