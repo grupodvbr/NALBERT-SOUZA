@@ -10,79 +10,73 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      /* Dark palette */
-      --bg: #0b0e14;
-      --panel: #11151f;
-      --ink: #e6e8ef;
-      --muted: #a0a7ba;
-      --soft: #151a26;
-      --primary: #00d4ff;    /* ciano */
-      --accent: #ff2e88;     /* magenta */
-      --ok: #35d399;         /* verde */
-      --warn: #fec84b;       /* amber */
-      --danger: #f43f5e;     /* red */
-      --ring1: #00d4ff;
-      --ring2: #ff2e88;
+      /* === PALETA DO PRINT PRETO (mesmas cores) === */
+      --bg: #0a0a0a;          /* fundo preto */
+      --panel: #111111;       /* cartões */
+      --soft: #161616;        /* detalhes */
+      --ink: #f5f7ff;         /* texto principal */
+      --muted: #a9b0c2;       /* texto secundário */
+      --ring1: #00d1ff;       /* ciano */
+      --ring2: #ff2e88;       /* rosa */
+      --primary: #00d1ff;     /* ciano */
+      --accent: #ff2e88;      /* rosa */
+      --ok: #37d399;          /* verde suave p/ positivos */
+      --warn: #fec84b;        /* amber */
+      --danger: #f43f5e;      /* red */
       --card-radius: 18px;
-      --shadow: 0 6px 30px rgba(0,0,0,.35);
+      --shadow: 0 10px 40px rgba(0,0,0,.45);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: radial-gradient(1200px 800px at 70% -10%, rgba(0,212,255,.12), transparent 60%),
-                  radial-gradient(900px 600px at -10% 20%, rgba(255,46,136,.10), transparent 55%),
+      background: radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+                  radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
                   var(--bg);
       color:var(--ink);
     }
-    .wrap{max-width:1400px;margin:32px auto;padding:0 24px}
-    header{
-      display:flex;align-items:center;justify-content:space-between;margin-bottom:22px
-    }
-    .title{
-      font-size:28px;font-weight:700;letter-spacing:.3px
-    }
+    .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+    .title{font-size:28px;font-weight:700;letter-spacing:.3px}
     .subtitle{color:var(--muted);font-size:14px}
     .controls{display:flex;gap:12px;align-items:center}
-    .btn, select{
-      background:var(--panel);border:1px solid #1d2433;color:var(--ink);
-      padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);
-    }
+    .btn, select{background:var(--panel);border:1px solid #1f1f1f;color:var(--ink);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow)}
     .btn:hover{filter:brightness(1.08)}
     select{appearance:none}
 
-    /* KPI grid */
-    .grid{
-      display:grid;gap:18px;
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);
-      border:1px solid #1c2230; border-radius:var(--card-radius); padding:16px 18px; box-shadow:var(--shadow);
-      position:relative; overflow:hidden
-    }
+    /* NAV de MÓDULOS */
+    .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
+    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden}
+    .mod:hover{transform:translateY(-2px);transition:.2s ease;filter:brightness(1.02)}
+    .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
+    .mod .desc{color:var(--muted);font-size:12px}
+    .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
+    .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
+    .spark{width:100%;height:54px;margin-top:10px}
+    .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip{display:inline-flex;align-items:center;gap:6px;background:#0f0f0f;border:1px solid #1e1e1e;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
+
+    /* KPI GRID secundário */
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
     .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
     .kpi-line{display:flex;align-items:center;justify-content:space-between}
     .kpi-value{font-size:28px;font-weight:700}
-    .kpi-foot{color:var(--muted);font-size:12px;margin-top:8px}
-    .pill{font-size:12px;color:#0b0e14;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
+    .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
 
-    /* Big charts */
-    .charts{display:grid;grid-template-columns: 2fr 1fr; gap:18px; margin-top:18px}
+    /* CHARTS maiores */
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
     .chart-card{padding:18px}
     canvas{width:100%;height:100%}
+
+    /* RINGS */
     .ring-wrap{display:flex;gap:22px;align-items:center;justify-content:space-between;margin-top:10px}
-    .ring{
-      width:170px;height:170px;display:grid;place-items:center
-    }
+    .ring{width:170px;height:170px;display:grid;place-items:center}
     .ring .value{font-size:24px;font-weight:700}
     .ring .sub{font-size:12px;color:var(--muted)}
 
-    /* Desktop-first; small tweaks for narrower screens */
-    @media (max-width:1200px){
-      .grid{grid-template-columns: repeat(2,1fr)}
-      .charts{grid-template-columns:1fr}
-    }
+    @media (max-width:1280px){.modules{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -90,7 +84,7 @@
     <header>
       <div>
         <div class="title">Dashboard Unificado</div>
-        <div class="subtitle">Período <span id="periodo-label">—</span> • Empresa <span id="empresa-label">Todas</span></div>
+        <div class="subtitle">Versão Desktop • Paleta do print preto (ciano/rosa)</div>
       </div>
       <div class="controls">
         <select id="empresa">
@@ -106,99 +100,99 @@
       </div>
     </header>
 
-    <!-- KPIs linha 1 (Folha/RH) -->
-    <section class="grid" id="grid-kpi-1">
+    <!-- ===== MÓDULOS (visuais + navegação) ===== -->
+    <section class="modules">
+      <a class="mod" href="metas/index.html">
+        <span class="badge">Metas</span>
+        <h4>Metas</h4>
+        <div class="desc">Faturamento vs. objetivo</div>
+        <div class="kpi" id="kpi-metas">—</div>
+        <canvas id="spark-metas" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--primary)"></i> Progresso</span></div>
+      </a>
+      <a class="mod" href="cancelamentos/index.html">
+        <span class="badge">Cancelamentos</span>
+        <h4>Cancelamentos</h4>
+        <div class="desc">Itens/valor cancelado</div>
+        <div class="kpi" id="kpi-cancel">—</div>
+        <canvas id="spark-cancel" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div>
+      </a>
+      <a class="mod" href="travas/index.html">
+        <span class="badge">Travas</span>
+        <h4>Travas de Compras</h4>
+        <div class="desc">Planos válidos e já comprado</div>
+        <div class="kpi" id="kpi-travas">—</div>
+        <canvas id="spark-travas" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div>
+      </a>
+      <a class="mod" href="resumo-financeiro/index.html">
+        <span class="badge">Financeiro</span>
+        <h4>Resumo Financeiro</h4>
+        <div class="desc">Entradas x Saídas</div>
+        <div class="kpi" id="kpi-fin">—</div>
+        <canvas id="spark-fin" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div>
+      </a>
+      <a class="mod" href="delivery/index.html">
+        <span class="badge">Delivery</span>
+        <h4>Vendas em Delivery</h4>
+        <div class="desc">Pedidos / ticket médio</div>
+        <div class="kpi" id="kpi-delivery">—</div>
+        <canvas id="spark-delivery" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--primary)"></i> Crescimento</span></div>
+      </a>
+      <a class="mod" href="conciliacao/index.html">
+        <span class="badge">Bancária</span>
+        <h4>Conciliação Bancária</h4>
+        <div class="desc">Conferência de movimentos</div>
+        <div class="kpi" id="kpi-bank">—</div>
+        <canvas id="spark-bank" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div>
+      </a>
+      <a class="mod" href="pesquisa/index.html">
+        <span class="badge">NPS</span>
+        <h4>Pesquisa de Satisfação</h4>
+        <div class="desc">NPS / avaliações</div>
+        <div class="kpi" id="kpi-nps">—</div>
+        <canvas id="spark-nps" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div>
+      </a>
+      <a class="mod" href="midias/index.html">
+        <span class="badge">Mídias</span>
+        <h4>Mídias Sociais</h4>
+        <div class="desc">Views / engajamento</div>
+        <div class="kpi" id="kpi-views">—</div>
+        <canvas id="spark-views" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div>
+      </a>
+    </section>
+
+    <!-- KPIs gerais (exemplo) -->
+    <section class="grid">
       <div class="card">
-        <h3>Período de Apuração</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill" id="kpi-apuracao">—</span></div>
-        <div class="kpi-foot">Início <b id="kpi-inicio">—</b> • Fim <b id="kpi-fim">—</b></div>
+        <h3>Período</h3>
+        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill">Ativo</span></div>
       </div>
       <div class="card">
         <h3>Funcionários</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill">Ativos</span></div>
-        <div class="kpi-foot">Admitidos <b id="kpi-func-adm">—</b> • Demitidos <b id="kpi-func-dem">—</b></div>
+        <div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div>
       </div>
-      <div class="card">
-        <h3>Vencimentos</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-venc-exp">—</div><span class="pill">Experiência</span></div>
-        <div class="kpi-foot">EPI's <b id="kpi-venc-epis">—</b></div>
-      </div>
-    </section>
-
-    <!-- KPIs linha 2 (Banco de horas / Marcações / Coletores) -->
-    <section class="grid" style="margin-top:18px">
       <div class="card">
         <h3>Banco de Horas</h3>
         <div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div>
-        <div class="kpi-foot">Débitos <b id="kpi-debito">—</b></div>
-      </div>
-      <div class="card">
-        <h3>Marcações</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-marcacoes">—</div><span class="pill">Coletadas</span></div>
-        <div class="kpi-foot">Última <b id="kpi-marc-ultima">—</b></div>
-      </div>
-      <div class="card">
-        <h3>Coletores</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-col-online">—</div><span class="pill" style="background:var(--accent)">Online</span></div>
-        <div class="kpi-foot">Offline <b id="kpi-col-off">—</b></div>
       </div>
     </section>
 
-    <!-- Rings + Social KPIs -->
-    <section class="card" style="margin-top:18px">
-      <div class="ring-wrap">
-        <div class="ring">
-          <canvas id="ring-views"></canvas>
-          <div class="value" id="views-val">—</div>
-          <div class="sub">Views</div>
-        </div>
-        <div class="ring">
-          <canvas id="ring-likes"></canvas>
-          <div class="value" id="likes-val">—</div>
-          <div class="sub">Likes</div>
-        </div>
-        <div class="ring">
-          <canvas id="ring-shares"></canvas>
-          <div class="value" id="shares-val">—</div>
-          <div class="sub">Shares</div>
-        </div>
-        <div class="ring">
-          <canvas id="ring-comments"></canvas>
-          <div class="value" id="comments-val">—</div>
-          <div class="sub">Comments</div>
-        </div>
-        <div style="flex:1">
-          <div class="grid" style="grid-template-columns:repeat(2,1fr)">
-            <div class="card" style="padding:14px">
-              <h3>Total time watched (s)</h3>
-              <div class="kpi-line"><div class="kpi-value" id="kpi-watch">—</div></div>
-            </div>
-            <div class="card" style="padding:14px">
-              <h3>Total duration of video (s)</h3>
-              <div class="kpi-line"><div class="kpi-value" id="kpi-duration">—</div></div>
-            </div>
-            <div class="card" style="padding:14px">
-              <h3>Videos</h3>
-              <div class="kpi-line"><div class="kpi-value" id="kpi-videos">—</div></div>
-            </div>
-            <div class="card" style="padding:14px">
-              <h3>Followers • Profile views</h3>
-              <div class="kpi-line"><div class="kpi-value"><span id="kpi-followers">—</span> • <span id="kpi-profile">—</span></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Charts area -->
+    <!-- CHARTS maiores (visual) -->
     <section class="charts">
       <div class="card chart-card">
-        <h3>Timeline insights</h3>
-        <canvas id="line-timeline" height="280"></canvas>
+        <h3>Timeline geral</h3>
+        <canvas id="line-timeline" height="300"></canvas>
       </div>
       <div class="card chart-card">
-        <h3>Seus dias mais ativos</h3>
-        <canvas id="bar-days" height="280"></canvas>
+        <h3>Dias mais ativos</h3>
+        <canvas id="bar-days" height="300"></canvas>
       </div>
     </section>
 
@@ -207,175 +201,88 @@
 
 <script>
 /**************** CONFIG ****************/
-const CONFIG = {
-  WEBAPP_URL: '', // ex.: 'https://script.google.com/macros/s/AKfycbx.../exec'
-  DEFAULT_EMPRESA: 'VILLA GOURMET'
-};
-
-/************* Helpers UI *************/
-const $ = sel => document.querySelector(sel);
+const CONFIG = { WEBAPP_URL: '' };
+const $ = s => document.querySelector(s);
 const fmt = new Intl.NumberFormat('pt-BR');
-const fmtTime = s => {
-  if (!s && s !== 0) return '—';
-  // aceita tanto "1145:03" quanto segundos (número)
-  if (typeof s === 'string' && s.includes(':')) return s;
-  const sec = Number(s||0);
-  const h = Math.floor(sec/3600).toString();
-  const m = Math.floor((sec%3600)/60).toString().padStart(2,'0');
-  const x = Math.floor(sec%60).toString().padStart(2,'0');
-  return `${h}:${m}:${x}`;
-}
-function countTo(el, end){
-  const start = 0; const dur = 800; const t0 = performance.now();
-  function step(t){
-    const p = Math.min(1,(t - t0)/dur);
-    el.textContent = end >= 1000 ? fmt.format(Math.round(end*p)) : Math.round(end*p);
-    if (p<1) requestAnimationFrame(step);
-  } requestAnimationFrame(step);
-}
 
-/************** Data layer **************/
-async function fetchDashboard(empresa, periodo){
-  // Espera que o Apps Script retorne um JSON consolidado (ver modelo abaixo)
-  if (!CONFIG.WEBAPP_URL){
-    // Fallback demo (dados mock) para visual
-    return new Promise(res=> setTimeout(()=> res(mockData(empresa, periodo)), 400));
-  }
-  const url = new URL(CONFIG.WEBAPP_URL);
-  url.searchParams.set('action','dashboard');
-  url.searchParams.set('empresa', empresa);
-  url.searchParams.set('periodo', periodo);
-  const r = await fetch(url, {method:'GET'});
-  if (!r.ok) throw new Error('Falha ao buscar dados');
-  return r.json();
-}
-
-/* Modelo esperado do JSON do Apps Script (exemplo):
-{
-  periodo: { competencia:"09/2024", inicio:"2024-09-01", fim:"2024-09-30" },
-  rh: { ativos:16, admitidos:0, demitidos:0, experiencia:0, epis:0, bh_creditos:"1145:03", bh_debitos:"30:02", marcacoes:55, marcacao_ultima:"2024-05-29 20:00", coletor_online:0, coletor_off:7 },
-  social: { views:42981, likes:7637, shares:398, comments:959, watch:1500000, duration:2100, videos:75, followers:5000, profile:2000 },
-  timeline: { labels:["2024-04-15","2024-04-22",...], likes:[...], followers:[...], videos:[...] },
-  days: { labels:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"], values:[16,8,11,16,9,8,7]},
-  last_update:"2024-09-30 23:59"
-}
-*/
-
-/************** Charts **************/
-let chartRings = {}, chartLine, chartBar;
-function makeRing(ctx){
-  return new Chart(ctx,{ type:'doughnut', data:{ labels:['A','B'], datasets:[{ data:[70,30], borderWidth:0, cutout:'72%',
-    backgroundColor:[getComputedStyle(document.documentElement).getPropertyValue('--ring1'), getComputedStyle(document.documentElement).getPropertyValue('--ring2')] }] },
-    options:{ plugins:{ legend:{display:false}, tooltip:{enabled:false} }, responsive:true, maintainAspectRatio:false });
-}
-function updateRing(chart, ratio){
-  chart.data.datasets[0].data = [Math.max(0,Math.min(100, ratio)), 100 - Math.max(0,Math.min(100, ratio))];
-  chart.update();
+/**************** CHART HELPERS ****************/
+function spark(el, data){
+  const ctx = document.getElementById(el);
+  const grad = ctx.getContext('2d').createLinearGradient(0,0,0,60);
+  grad.addColorStop(0, 'rgba(0,209,255,.35)');
+  grad.addColorStop(1, 'rgba(255,46,136,.05)');
+  return new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data, borderWidth:2, pointRadius:0, tension:.35, fill:true, backgroundColor:grad, borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{x:{display:false},y:{display:false}},elements:{line:{borderJoinStyle:'round'}}});
 }
 function makeLine(ctx){
-  return new Chart(ctx,{ type:'line', data:{ labels:[], datasets:[
-    { label:'Likes', data:[], tension:.35, borderWidth:2, pointRadius:0 },
-    { label:'Novos seguidores', data:[], tension:.35, borderWidth:2, pointRadius:0 },
-    { label:'Vídeos', data:[], tension:.35, borderWidth:2, pointRadius:0 }
-  ]}, options:{ scales:{ x:{ ticks:{ color: getComputedStyle(document.documentElement).getPropertyValue('--muted')} }, y:{ grid:{ color:'rgba(255,255,255,.06)'} } },
-  plugins:{ legend:{ labels:{ color: getComputedStyle(document.documentElement).getPropertyValue('--muted') } } } });
+  return new Chart(ctx,{type:'line',data:{labels:[],datasets:[
+    {label:'Likes',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},
+    {label:'Novos seguidores',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}
+  ]},options:{scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}});
 }
 function makeBar(ctx){
-  return new Chart(ctx,{ type:'bar', data:{ labels:[], datasets:[{ label:'Posts', data:[] }] }, options:{ scales:{ y:{ grid:{ color:'rgba(255,255,255,.06)'} } }, plugins:{ legend:{ labels:{ color: getComputedStyle(document.documentElement).getPropertyValue('--muted') } } } });
+  return new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Eventos',data:[],backgroundColor:'#00d1ff'}]},options:{scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}}});
 }
 
-/************** Render **************/
-async function render(){
-  const empresa = $('#empresa').value;
-  const periodo = $('#periodo').value || new Date().toISOString().slice(0,7); // yyyy-mm
-  $('#empresa-label').textContent = empresa;
-  $('#periodo-label').textContent = periodo;
-  const data = await fetchDashboard(empresa, periodo);
-
-  // RH
-  $('#kpi-competencia').textContent = data.periodo?.competencia || '—';
-  $('#kpi-inicio').textContent = data.periodo?.inicio || '—';
-  $('#kpi-fim').textContent = data.periodo?.fim || '—';
-  $('#kpi-apuracao').textContent = 'Ativo';
-  countTo($('#kpi-func-ativos'), +data.rh?.ativos || 0);
-  $('#kpi-func-adm').textContent = data.rh?.admitidos ?? '—';
-  $('#kpi-func-dem').textContent = data.rh?.demitidos ?? '—';
-  $('#kpi-venc-exp').textContent = data.rh?.experiencia ?? '—';
-  $('#kpi-venc-epis').textContent = data.rh?.epis ?? '—';
-  $('#kpi-credito').textContent = fmtTime(data.rh?.bh_creditos);
-  $('#kpi-debito').textContent = fmtTime(data.rh?.bh_debitos);
-  $('#kpi-marcacoes').textContent = data.rh?.marcacoes ?? '—';
-  $('#kpi-marc-ultima').textContent = data.rh?.marcacao_ultima ?? '—';
-  $('#kpi-col-online').textContent = data.rh?.coletor_online ?? '—';
-  $('#kpi-col-off').textContent = data.rh?.coletor_off ?? '—';
-
-  // Social KPIs
-  const s = data.social || {};
-  countTo($('#views-val'), +s.views || 0);
-  countTo($('#likes-val'), +s.likes || 0);
-  countTo($('#shares-val'), +s.shares || 0);
-  countTo($('#comments-val'), +s.comments || 0);
-  $('#kpi-watch').textContent = s.watch ? (s.watch>900 ? (s.watch/1000).toFixed(1)+'K' : s.watch) : '—';
-  $('#kpi-duration').textContent = s.duration ? fmt.format(s.duration) : '—';
-  $('#kpi-videos').textContent = s.videos ?? '—';
-  $('#kpi-followers').textContent = s.followers ? fmt.format(s.followers) : '—';
-  $('#kpi-profile').textContent = s.profile ? fmt.format(s.profile) : '—';
-
-  // Rings ratios (exemplo: taxa like/view, share/view, comment/view)
-  const views = Math.max(+s.views||0, 1);
-  updateRing(chartRings.views, Math.min(100, ((+s.likes||0)/views)*100));
-  updateRing(chartRings.likes, Math.min(100, ((+s.shares||0)/views)*100));
-  updateRing(chartRings.shares, Math.min(100, ((+s.comments||0)/views)*100));
-  updateRing(chartRings.comments, Math.min(100, ((+s.videos||0)/100)*100));
-
-  // Line
-  chartLine.data.labels = data.timeline?.labels || [];
-  chartLine.data.datasets[0].data = data.timeline?.likes || [];
-  chartLine.data.datasets[1].data = data.timeline?.followers || [];
-  chartLine.data.datasets[2].data = data.timeline?.videos || [];
-  chartLine.update();
-
-  // Bar
-  chartBar.data.labels = data.days?.labels || [];
-  chartBar.data.datasets[0].data = data.days?.values || [];
-  chartBar.update();
-
-  $('#last-update').textContent = data.last_update || new Date().toLocaleString('pt-BR');
-}
-
-/************** Mock (demo offline) **************/
-function mockData(empresa, periodo){
-  const labels = Array.from({length:7}, (_,i)=> new Date(Date.now()- (6-i)*86400000)).map(d=> d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}));
+/**************** MOCK VISUAL (até conectar) ****************/
+function mock(){
+  const r = ()=> Math.round(40+Math.random()*80);
+  const arr = (n)=> Array.from({length:n}, ()=> r());
   return {
-    periodo:{ competencia: (periodo? periodo.split('-').reverse().join('/') : '09/2024'), inicio:'01/09/2024', fim:'30/09/2024' },
-    rh:{ ativos:16, admitidos:0, demitidos:0, experiencia:0, epis:0, bh_creditos:'1145:03', bh_debitos:'30:02', marcacoes:55, marcacao_ultima:'29/05/2024 20:00', coletor_online:0, coletor_off:7 },
-    social:{ views:42981, likes:7637, shares:398, comments:959, watch:1500000, duration:2100, videos:75, followers:5000, profile:2000 },
-    timeline:{ labels, likes:[180,220,260,300,450,200,10], followers:[60,120,180,250,380,150,8], videos:[0,0,0,1,0,1,0] },
-    days:{ labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'], values:[16,8,11,16,9,8,7] },
-    last_update: new Date().toLocaleString('pt-BR')
-  }
+    periodo:'09/2024',
+    func_ativos:16,
+    bh_creditos:'1145:03',
+    modules:{
+      metas:{kpi: '78%', spark: arr(12)},
+      cancel:{kpi: 'R$ 12.450', spark: arr(12)},
+      travas:{kpi: 'R$ 198k', spark: arr(12)},
+      fin:{kpi: 'R$ 85k', spark: arr(12)},
+      delivery:{kpi: 'R$ 42k', spark: arr(12)},
+      bank:{kpi: '23 pend.', spark: arr(12)},
+      nps:{kpi: 'NPS 72', spark: arr(12)},
+      views:{kpi: '42.981', spark: arr(12)}
+    },
+    timeline:{labels:['15/04','22/04','29/04','06/05','13/05','20/05','27/05'], likes:[180,220,260,300,450,200,10], followers:[60,120,180,250,380,150,8]},
+    days:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'], values:[16,8,11,16,9,8,7]},
+    last: new Date().toLocaleString('pt-BR')
+  };
 }
 
-/************** Boot **************/
-window.addEventListener('DOMContentLoaded', ()=>{
-  // defaults
-  $('#empresa').value = CONFIG.DEFAULT_EMPRESA || 'TODAS';
-  $('#periodo').value = new Date().toISOString().slice(0,7);
+/**************** RENDER ****************/
+let chartLine, chartBar, sparks = {};
+function render(data){
+  // Módulos
+  $('#kpi-metas').textContent      = data.modules.metas.kpi;      sparks.metas    = spark('spark-metas', data.modules.metas.spark);
+  $('#kpi-cancel').textContent     = data.modules.cancel.kpi;     sparks.cancel   = spark('spark-cancel', data.modules.cancel.spark);
+  $('#kpi-travas').textContent     = data.modules.travas.kpi;     sparks.travas   = spark('spark-travas', data.modules.travas.spark);
+  $('#kpi-fin').textContent        = data.modules.fin.kpi;        sparks.fin      = spark('spark-fin', data.modules.fin.spark);
+  $('#kpi-delivery').textContent   = data.modules.delivery.kpi;   sparks.delivery = spark('spark-delivery', data.modules.delivery.spark);
+  $('#kpi-bank').textContent       = data.modules.bank.kpi;       sparks.bank     = spark('spark-bank', data.modules.bank.spark);
+  $('#kpi-nps').textContent        = data.modules.nps.kpi;        sparks.nps      = spark('spark-nps', data.modules.nps.spark);
+  $('#kpi-views').textContent      = data.modules.views.kpi;      sparks.views    = spark('spark-views', data.modules.views.spark);
 
-  // rings
-  chartRings.views = makeRing($('#ring-views'));
-  chartRings.likes = makeRing($('#ring-likes'));
-  chartRings.shares = makeRing($('#ring-shares'));
-  chartRings.comments = makeRing($('#ring-comments'));
-  // line and bar
+  // KPIs gerais
+  $('#kpi-competencia').textContent = data.periodo;
+  $('#kpi-func-ativos').textContent = data.func_ativos;
+  $('#kpi-credito').textContent     = data.bh_creditos;
+
+  // Charts principais
   chartLine = makeLine($('#line-timeline'));
   chartBar  = makeBar($('#bar-days'));
+  chartLine.data.labels = data.timeline.labels;
+  chartLine.data.datasets[0].data = data.timeline.likes;
+  chartLine.data.datasets[1].data = data.timeline.followers;
+  chartLine.update();
+  chartBar.data.labels = data.days.labels;
+  chartBar.data.datasets[0].data = data.days.values;
+  chartBar.update();
 
-  $('#btn-refresh').addEventListener('click', render);
-  $('#empresa').addEventListener('change', render);
-  $('#periodo').addEventListener('change', render);
+  $('#last-update').textContent = data.last;
+}
 
-  render();
+window.addEventListener('DOMContentLoaded', ()=>{
+  // Visual primeiro: usa MOCK
+  const data = mock();
+  render(data);
 });
 </script>
 </body>
