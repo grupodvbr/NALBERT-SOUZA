@@ -102,7 +102,7 @@
 
     <!-- ===== MÓDULOS (visuais + navegação) ===== -->
     <section class="modules">
-      <a class="mod" href="metas/index.html">
+      <a class="mod" id="link-metas" href="#">
         <span class="badge">Metas</span>
         <h4>Metas</h4>
         <div class="desc">Faturamento vs. objetivo</div>
@@ -110,7 +110,7 @@
         <canvas id="spark-metas" class="spark"></canvas>
         <div class="foot"><span class="chip"><i style="background:var(--primary)"></i> Progresso</span></div>
       </a>
-      <a class="mod" href="cancelamentos/index.html">
+      <a class="mod" id="link-cancel" href="#">
         <span class="badge">Cancelamentos</span>
         <h4>Cancelamentos</h4>
         <div class="desc">Itens/valor cancelado</div>
@@ -118,7 +118,7 @@
         <canvas id="spark-cancel" class="spark"></canvas>
         <div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div>
       </a>
-      <a class="mod" href="travas/index.html">
+      <a class="mod" id="link-travas" href="#">
         <span class="badge">Travas</span>
         <h4>Travas de Compras</h4>
         <div class="desc">Planos válidos e já comprado</div>
@@ -126,7 +126,7 @@
         <canvas id="spark-travas" class="spark"></canvas>
         <div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div>
       </a>
-      <a class="mod" href="resumo-financeiro/index.html">
+      <a class="mod" id="link-fin" href="#">
         <span class="badge">Financeiro</span>
         <h4>Resumo Financeiro</h4>
         <div class="desc">Entradas x Saídas</div>
@@ -134,7 +134,7 @@
         <canvas id="spark-fin" class="spark"></canvas>
         <div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div>
       </a>
-      <a class="mod" href="delivery/index.html">
+      <a class="mod" id="link-delivery" href="#">
         <span class="badge">Delivery</span>
         <h4>Vendas em Delivery</h4>
         <div class="desc">Pedidos / ticket médio</div>
@@ -142,7 +142,7 @@
         <canvas id="spark-delivery" class="spark"></canvas>
         <div class="foot"><span class="chip"><i style="background:var(--primary)"></i> Crescimento</span></div>
       </a>
-      <a class="mod" href="conciliacao/index.html">
+      <a class="mod" id="link-bank" href="#">
         <span class="badge">Bancária</span>
         <h4>Conciliação Bancária</h4>
         <div class="desc">Conferência de movimentos</div>
@@ -150,7 +150,7 @@
         <canvas id="spark-bank" class="spark"></canvas>
         <div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div>
       </a>
-      <a class="mod" href="pesquisa/index.html">
+      <a class="mod" id="link-nps" href="#">
         <span class="badge">NPS</span>
         <h4>Pesquisa de Satisfação</h4>
         <div class="desc">NPS / avaliações</div>
@@ -158,7 +158,7 @@
         <canvas id="spark-nps" class="spark"></canvas>
         <div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div>
       </a>
-      <a class="mod" href="midias/index.html">
+      <a class="mod" id="link-midias" href="#">
         <span class="badge">Mídias</span>
         <h4>Mídias Sociais</h4>
         <div class="desc">Views / engajamento</div>
@@ -200,18 +200,41 @@
   </div>
 
 <script>
-/**************** CONFIG ****************/
-const CONFIG = { WEBAPP_URL: '' };
+/**************** CONFIG (links dos painéis antigos + APIs) ****************/
+const CONFIG = {
+  LINKS: {
+    METAS: 'metas/index.html',                 // troque pelos links antigos
+    CANCELAMENTOS: 'cancelamentos/index.html',
+    TRAVAS: 'travas/index.html',
+    FINANCEIRO: 'resumo-financeiro/index.html',
+    DELIVERY: 'delivery/index.html',
+    CONCILIACAO: 'conciliacao/index.html',
+    PESQUISA: 'pesquisa/index.html',
+    MIDIAS: 'midias/index.html'
+  },
+  APIS: {
+    // Endpoints reais que você já usa (fornecidos anteriormente)
+    METAS: 'https://script.google.com/macros/s/AKfycbziCPWWJxxfrnSeT3RHsNbw21z9MfnnB8JpV7ZQcZnvUQQ7dL3lVJdpUG7epACVjFaO/exec',
+    CANCELAMENTOS: 'https://script.google.com/macros/s/AKfycbzM1mmixFkFE5tbC-0Evc6GVyZEJkh88HCikNK08FujRwCrgUA1e_E29nMHip81kRPoSg/exec',
+    PESQUISA: 'https://script.google.com/macros/s/AKfycbyK3A5CDn_EgA3pbRVToh87_qKWvbIry886OkR1AdkJi7RyvSgcwY0BmRqhbKQnEKwgrA/exec',
+    TRAVAS: '',          // preencha quando tiver o webapp consolidado
+    FINANCEIRO: '',
+    DELIVERY: '',
+    CONCILIACAO: '',
+    MIDIAS: ''
+  }
+};
+
 const $ = s => document.querySelector(s);
-const fmt = new Intl.NumberFormat('pt-BR');
+const fmt = new Intl.NumberFormat('pt-BR', {maximumFractionDigits:0});
 
 /**************** CHART HELPERS ****************/
-function spark(el, data){
+function spark(el, data, color='#00d1ff'){
   const ctx = document.getElementById(el);
-  const grad = ctx.getContext('2d').createLinearGradient(0,0,0,60);
-  grad.addColorStop(0, 'rgba(0,209,255,.35)');
-  grad.addColorStop(1, 'rgba(255,46,136,.05)');
-  return new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data, borderWidth:2, pointRadius:0, tension:.35, fill:true, backgroundColor:grad, borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{x:{display:false},y:{display:false}},elements:{line:{borderJoinStyle:'round'}}});
+  const g = ctx.getContext('2d').createLinearGradient(0,0,0,60);
+  g.addColorStop(0, color.replace(')',', .35)').replace('rgb','rgba').replace('#00d1ff','rgba(0,209,255'));
+  g.addColorStop(1, 'rgba(255,46,136,.05)');
+  return new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data, borderWidth:2, pointRadius:0, tension:.35, fill:true, backgroundColor:g, borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{x:{display:false},y:{display:false}},elements:{line:{borderJoinStyle:'round'}}});
 }
 function makeLine(ctx){
   return new Chart(ctx,{type:'line',data:{labels:[],datasets:[
@@ -223,66 +246,131 @@ function makeBar(ctx){
   return new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Eventos',data:[],backgroundColor:'#00d1ff'}]},options:{scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}}});
 }
 
-/**************** MOCK VISUAL (até conectar) ****************/
-function mock(){
-  const r = ()=> Math.round(40+Math.random()*80);
-  const arr = (n)=> Array.from({length:n}, ()=> r());
-  return {
-    periodo:'09/2024',
-    func_ativos:16,
-    bh_creditos:'1145:03',
-    modules:{
-      metas:{kpi: '78%', spark: arr(12)},
-      cancel:{kpi: 'R$ 12.450', spark: arr(12)},
-      travas:{kpi: 'R$ 198k', spark: arr(12)},
-      fin:{kpi: 'R$ 85k', spark: arr(12)},
-      delivery:{kpi: 'R$ 42k', spark: arr(12)},
-      bank:{kpi: '23 pend.', spark: arr(12)},
-      nps:{kpi: 'NPS 72', spark: arr(12)},
-      views:{kpi: '42.981', spark: arr(12)}
-    },
-    timeline:{labels:['15/04','22/04','29/04','06/05','13/05','20/05','27/05'], likes:[180,220,260,300,450,200,10], followers:[60,120,180,250,380,150,8]},
-    days:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'], values:[16,8,11,16,9,8,7]},
-    last: new Date().toLocaleString('pt-BR')
-  };
+/**************** ADAPTERS (transformam o retorno das APIs antigas) ****************/
+async function fetchJSON(url){
+  const r = await fetch(url, {method:'GET'});
+  if(!r.ok) throw new Error('Falha ao carregar '+url);
+  return r.json();
 }
+
+const adapters = {
+  metas: async ()=>{
+    if(!CONFIG.APIS.METAS) return null;
+    const data = await fetchJSON(CONFIG.APIS.METAS);
+    // Ajuste aqui conforme o schema real do seu WebApp de Metas
+    // Exemplo esperado: { meta: 735000, realizado: 612300, serie:[...valores por dia...] }
+    const meta = data.meta ?? data.META ?? 0;
+    const real = data.realizado ?? data.REAL ?? 0;
+    const progresso = meta>0 ? Math.round((real/meta)*100) : 0;
+    const serie = data.serie ?? data.timeline ?? (data.valores || []);
+    return { kpi: progresso+"%", spark: serie.slice(-12) };
+  },
+  cancel: async ()=>{
+    if(!CONFIG.APIS.CANCELAMENTOS) return null;
+    const data = await fetchJSON(CONFIG.APIS.CANCELAMENTOS);
+    // Exemplo: { total_cancelado: 12450, serie:[...]} ou lista de itens
+    let total = data.total_cancelado ?? 0;
+    if(Array.isArray(data)) total = data.reduce((s,it)=> s + (Number(it.valor)||0), 0);
+    const serie = data.serie ?? (data.timeline || []);
+    return { kpi: 'R$ '+ total.toLocaleString('pt-BR'), spark: serie.slice(-12) };
+  },
+  travas: async ()=>{
+    if(!CONFIG.APIS.TRAVAS) return null;
+    const data = await fetchJSON(CONFIG.APIS.TRAVAS);
+    // Exemplo: { comprado: 198000, serie:[...] }
+    const v = data.comprado ?? 0; const serie = data.serie || [];
+    return { kpi: 'R$ '+ v.toLocaleString('pt-BR'), spark: serie.slice(-12) };
+  },
+  financeiro: async ()=>{
+    if(!CONFIG.APIS.FINANCEIRO) return null;
+    const d = await fetchJSON(CONFIG.APIS.FINANCEIRO);
+    const saldo = (d.entradas||0) - (d.saidas||0);
+    const serie = d.serie || [];
+    return { kpi: 'R$ '+ saldo.toLocaleString('pt-BR'), spark: serie.slice(-12) };
+  },
+  delivery: async ()=>{
+    if(!CONFIG.APIS.DELIVERY) return null;
+    const d = await fetchJSON(CONFIG.APIS.DELIVERY);
+    const receita = d.total ?? d.receita ?? 0;
+    const serie = d.serie || [];
+    return { kpi: 'R$ '+ receita.toLocaleString('pt-BR'), spark: serie.slice(-12) };
+  },
+  conciliacao: async ()=>{
+    if(!CONFIG.APIS.CONCILIACAO) return null;
+    const d = await fetchJSON(CONFIG.APIS.CONCILIACAO);
+    const pend = d.pendencias ?? 0; const serie = d.serie || [];
+    return { kpi: pend+' pend.', spark: serie.slice(-12) };
+  },
+  nps: async ()=>{
+    if(!CONFIG.APIS.PESQUISA) return null;
+    const d = await fetchJSON(CONFIG.APIS.PESQUISA);
+    const nps = d.nps ?? d.NPS ?? 0; const serie = d.serie || [];
+    return { kpi: 'NPS '+ nps, spark: serie.slice(-12) };
+  },
+  midias: async ()=>{
+    if(!CONFIG.APIS.MIDIAS) return null;
+    const d = await fetchJSON(CONFIG.APIS.MIDIAS);
+    const views = d.views ?? 0; const serie = d.serie || [];
+    return { kpi: fmt.format(views), spark: serie.slice(-12) };
+  }
+};
 
 /**************** RENDER ****************/
 let chartLine, chartBar, sparks = {};
-function render(data){
-  // Módulos
-  $('#kpi-metas').textContent      = data.modules.metas.kpi;      sparks.metas    = spark('spark-metas', data.modules.metas.spark);
-  $('#kpi-cancel').textContent     = data.modules.cancel.kpi;     sparks.cancel   = spark('spark-cancel', data.modules.cancel.spark);
-  $('#kpi-travas').textContent     = data.modules.travas.kpi;     sparks.travas   = spark('spark-travas', data.modules.travas.spark);
-  $('#kpi-fin').textContent        = data.modules.fin.kpi;        sparks.fin      = spark('spark-fin', data.modules.fin.spark);
-  $('#kpi-delivery').textContent   = data.modules.delivery.kpi;   sparks.delivery = spark('spark-delivery', data.modules.delivery.spark);
-  $('#kpi-bank').textContent       = data.modules.bank.kpi;       sparks.bank     = spark('spark-bank', data.modules.bank.spark);
-  $('#kpi-nps').textContent        = data.modules.nps.kpi;        sparks.nps      = spark('spark-nps', data.modules.nps.spark);
-  $('#kpi-views').textContent      = data.modules.views.kpi;      sparks.views    = spark('spark-views', data.modules.views.spark);
+function setLinks(){
+  $('#link-metas').href  = CONFIG.LINKS.METAS;
+  $('#link-cancel').href = CONFIG.LINKS.CANCELAMENTOS;
+  $('#link-travas').href = CONFIG.LINKS.TRAVAS;
+  $('#link-fin').href    = CONFIG.LINKS.FINANCEIRO;
+  $('#link-delivery').href = CONFIG.LINKS.DELIVERY;
+  $('#link-bank').href   = CONFIG.LINKS.CONCILIACAO;
+  $('#link-nps').href    = CONFIG.LINKS.PESQUISA;
+  $('#link-midias').href = CONFIG.LINKS.MIDIAS;
+}
 
-  // KPIs gerais
-  $('#kpi-competencia').textContent = data.periodo;
-  $('#kpi-func-ativos').textContent = data.func_ativos;
-  $('#kpi-credito').textContent     = data.bh_creditos;
+function renderModule(idKpi, idSpark, payload){
+  if(!payload) return; // sem API definida ainda
+  $(idKpi).textContent = payload.kpi || '—';
+  if(payload.spark && payload.spark.length){ sparks[idSpark] = spark(idSpark, payload.spark); }
+}
 
-  // Charts principais
+async function loadModules(){
+  const [m,c,t,f,d,b,n,mi] = await Promise.allSettled([
+    adapters.metas(), adapters.cancel(), adapters.travas(), adapters.financeiro(), adapters.delivery(), adapters.conciliacao(), adapters.nps(), adapters.midias()
+  ]);
+  if(m.value) renderModule('#kpi-metas','spark-metas', m.value);
+  if(c.value) renderModule('#kpi-cancel','spark-cancel', c.value);
+  if(t.value) renderModule('#kpi-travas','spark-travas', t.value);
+  if(f.value) renderModule('#kpi-fin','spark-fin', f.value);
+  if(d.value) renderModule('#kpi-delivery','spark-delivery', d.value);
+  if(b.value) renderModule('#kpi-bank','spark-bank', b.value);
+  if(n.value) renderModule('#kpi-nps','spark-nps', n.value);
+  if(mi.value) renderModule('#kpi-views','spark-views', mi.value);
+}
+
+function bootstrapCharts(){
   chartLine = makeLine($('#line-timeline'));
   chartBar  = makeBar($('#bar-days'));
-  chartLine.data.labels = data.timeline.labels;
-  chartLine.data.datasets[0].data = data.timeline.likes;
-  chartLine.data.datasets[1].data = data.timeline.followers;
+  // placeholders até puxar séries reais
+  chartLine.data.labels = ['S1','S2','S3','S4','S5','S6','S7'];
+  chartLine.data.datasets[0].data = [180,220,260,300,450,200,10];
+  chartLine.data.datasets[1].data = [60,120,180,250,380,150,8];
   chartLine.update();
-  chartBar.data.labels = data.days.labels;
-  chartBar.data.datasets[0].data = data.days.values;
+  chartBar.data.labels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  chartBar.data.datasets[0].data = [16,8,11,16,9,8,7];
   chartBar.update();
-
-  $('#last-update').textContent = data.last;
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
-  // Visual primeiro: usa MOCK
-  const data = mock();
-  render(data);
+  setLinks();
+  $('#periodo').value = new Date().toISOString().slice(0,7);
+  $('#kpi-competencia').textContent = $('#periodo').value.split('-').reverse().join('/');
+  $('#kpi-func-ativos').textContent = '—';
+  $('#kpi-credito').textContent = '—';
+  $('#last-update').textContent = new Date().toLocaleString('pt-BR');
+
+  bootstrapCharts();
+  loadModules();
 });
 </script>
 </body>
