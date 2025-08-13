@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Unificado • Dark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2;
+      --primary:#00d1ff; --accent:#ff2e88; --ok:#37d399; --warn:#fec84b; --danger:#f43f5e;
+      --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+        radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
+        var(--bg);
+      color:var(--ink);
+    }
+    .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+    .title{font-size:28px;font-weight:700;letter-spacing:.3px}
+    .subtitle{color:var(--muted);font-size:14px}
+    .controls{display:flex;gap:12px;align-items:center}
+    .btn, select{background:var(--panel);border:1px solid #1f1f1f;color:var(--ink);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow)}
+    .btn:hover{filter:brightness(1.08)}
+    select{appearance:none}
+
+    .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
+    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .2s ease, filter .2s ease}
+    .mod:hover{transform:translateY(-2px);filter:brightness(1.02)}
+    .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
+    .mod .desc{color:var(--muted);font-size:12px}
+    .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
+    .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
+    .spark{width:100%;height:54px;margin-top:10px}
+    .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip{display:inline-flex;align-items:center;gap:6px;background:#0f0f0f;border:1px solid #1e1e1e;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
+
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer}
+    .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
+    .kpi-line{display:flex;align-items:center;justify-content:space-between}
+    .kpi-value{font-size:28px;font-weight:700}
+    .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
+
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
+    .chart-card{padding:18px}
+    canvas{width:100%;height:100%}
+
+    @media (max-width:1280px){.modules{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="title">Dashboard Unificado</div>
+        <div class="subtitle">Versão Desktop • Paleta do print preto (ciano/rosa)</div>
+      </div>
+      <div class="controls">
+        <select id="empresa">
+          <option value="TODAS">Todas as empresas</option>
+          <option>MERCATTO DELICIA</option>
+          <option>DELICIA GOURMET</option>
+          <option>PADARIA DELICIA</option>
+          <option>VILLA GOURMET</option>
+          <option>M. KIDS</option>
+        </select>
+        <button class="btn" id="btn-refresh">Atualizar</button>
+        <button class="btn" id="btn-popup">Abrir Pop‑up</button>
+      </div>
+    </header>
+
+    <!-- Módulos -->
+    <section class="modules">
+      <a class="mod" data-mod="METAS" id="link-metas" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="kpi-metas">—</div><canvas id="spark-metas" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
+      <a class="mod" data-mod="CANCELAMENTOS" id="link-cancel" href="#"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="kpi-cancel">—</div><canvas id="spark-cancel" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
+      <a class="mod" data-mod="TRAVAS" id="link-travas" href="#"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="kpi-travas">—</div><canvas id="spark-travas" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
+      <a class="mod" data-mod="FINANCEIRO" id="link-fin" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="kpi-fin">—</div><canvas id="spark-fin" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
+      <a class="mod" data-mod="DELIVERY" id="link-delivery" href="#"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi" id="kpi-delivery">—</div><canvas id="spark-delivery" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
+      <a class="mod" data-mod="CONCILIACAO" id="link-bank" href="#"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi" id="kpi-bank">—</div><canvas id="spark-bank" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
+      <a class="mod" data-mod="PESQUISA" id="link-nps" href="#"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi" id="kpi-nps">—</div><canvas id="spark-nps" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
+      <a class="mod" data-mod="MIDIAS" id="link-midias" href="#"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi" id="kpi-views">—</div><canvas id="spark-views" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
+    </section>
+
+    <!-- KPIs gerais -->
+    <section class="grid">
+      <div class="card" id="card-saldo">
+        <h3>Saldo na Loja (todas as empresas ou selecionada)</h3>
+        <div class="kpi-line"><div class="kpi-value" id="kpi-saldo-caixa">—</div><span class="pill">Atual</span></div>
+      </div>
+      <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
+      <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
+    </section>
+
+    <!-- CHARTS -->
+    <section class="charts">
+      <div class="card chart-card"><h3>Timeline geral</h3><canvas id="line-timeline" height="300"></canvas></div>
+      <div class="card chart-card"><h3>Dias mais ativos</h3><canvas id="bar-days" height="300"></canvas></div>
+    </section>
+
+    <div class="subtitle" style="margin-top:16px">Última atualização: <span id="last-update">—</span></div>
+  </div>
+
+<script>
+/* ========= CONFIG ========= */
+const CONFIG = {
+  LINKS: {
+    METAS: 'metas/index.html',
+    CANCELAMENTOS: 'cancelamentos/index.html',
+    TRAVAS: 'travas/index.html',
+    FINANCEIRO: 'resumo-financeiro/index.html',
+    DELIVERY: 'delivery/index.html',
+    CONCILIACAO: 'conciliacao/index.html',
+    PESQUISA: 'pesquisa/index.html',
+    MIDIAS: 'midias/index.html'
+  },
+  WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbzqg8GEPFmod6W1xPxneXHAC6LRmnNAastew3QJtMpsf8mWwRowcZKZoNgRQskBM0-p/exec',
+  POPUP_URL: 'popup.html'
+};
+const $ = s => document.querySelector(s);
+const fmtBRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+
+/* ========= SALDO NA LOJA ========= */
+let payloadCaixa = null;
+async function loadCaixa(){
+  if (payloadCaixa) return payloadCaixa;
+  const r = await fetch(CONFIG.WEB_APP_URL,{cache:'no-store'});
+  const j = await r.json();
+  if (j.error) throw new Error(j.message||'Falha no Web App');
+  payloadCaixa = j; // {companies:[{company, saldoNaLoja, ...}]}
+  return j;
+}
+function computeSaldo(empresa){
+  if (!payloadCaixa?.companies?.length) return 0;
+  if (!empresa || empresa==='TODAS'){
+    return payloadCaixa.companies.reduce((s,c)=> s + (Number(c.saldoNaLoja)||0), 0);
+  }
+  const c = payloadCaixa.companies.find(x => norm(x.company)===norm(empresa));
+  return c ? (Number(c.saldoNaLoja)||0) : 0;
+}
+const norm = s => (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
+
+async function renderSaldo(){
+  await loadCaixa();
+  const empresa = $('#empresa').value;
+  const saldo = computeSaldo(empresa);
+  $('#kpi-saldo-caixa').textContent = fmtBRL.format(saldo);
+}
+
+/* ========= CHARTS DEMO ========= */
+function makeLine(ctx){
+  return new Chart(ctx,{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[
+    {label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},
+    {label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}
+  ]},options:{scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}});
+}
+function makeBar(ctx){
+  return new Chart(ctx,{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]},options:{scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}}});
+}
+
+/* ========= POP‑UP ========= */
+let popupWin = null;
+function currentFilters(){
+  const emp = $('#empresa').value;
+  return { company: emp };
+}
+function openPopup(){
+  const qs = new URLSearchParams(currentFilters()).toString();
+  const url = CONFIG.POPUP_URL + '?' + qs;
+  popupWin = window.open(url,'popup_livro_caixa','width=1200,height=800,menubar=no,toolbar=no,location=no');
+}
+function syncFiltersToPopup(){
+  if (popupWin && !popupWin.closed){
+    popupWin.postMessage({ type:'livrocaixa-filters', payload: currentFilters() }, '*');
+  }
+}
+
+/* ========= BOOT ========= */
+function init(){
+  document.getElementById('last-update').textContent = new Date().toLocaleString('pt-BR');
+  makeLine(document.getElementById('line-timeline'));
+  makeBar(document.getElementById('bar-days'));
+
+  renderSaldo();
+  document.getElementById('btn-refresh').addEventListener('click', renderSaldo);
+  document.getElementById('empresa').addEventListener('change', ()=>{ renderSaldo(); syncFiltersToPopup(); });
+
+  document.getElementById('btn-popup').addEventListener('click', openPopup);
+  document.getElementById('card-saldo').addEventListener('click', openPopup);
+  window.addEventListener('focus', syncFiltersToPopup);
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); }catch(e){ console.error(e); } });
+</script>
+</body>
+</html>
