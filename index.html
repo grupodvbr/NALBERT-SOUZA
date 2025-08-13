@@ -56,15 +56,15 @@
     position:relative;overflow:hidden;cursor:pointer
   }
   .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
-  .kpi-line{display:flex;align-items:center;justify-content:space-between}
+  .kpi-line{display:flex;align-items:center;justify-content:space-between;gap:10px}
   .kpi-value{font-size:28px;font-weight:700}
-  .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
+  .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:6px 10px;border-radius:999px;font-weight:700;border:0;cursor:pointer}
 
   .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
   .chart-card{padding:18px}
   canvas{width:100%;height:100%}
 
-  /* ===== Modal com iframe (zoom) ===== */
+  /* ===== Modal (iframe) com efeito de zoom ===== */
   .backdrop{
     position:fixed; inset:0; display:none; place-items:center;
     background:rgba(0,0,0,.55); backdrop-filter:saturate(110%) blur(4px); z-index:999;
@@ -74,7 +74,7 @@
     width:min(1200px,92vw); height:min(86vh,900px);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);
     border:1px solid #1e1e1e; border-radius:22px; box-shadow:var(--shadow);
-    transform:scale(.92); opacity:0; transition:transform .16s ease-out, opacity .16s ease-out;
+    transform:scale(.90); opacity:0; transition:transform .16s ease-out, opacity .16s ease-out;
     display:flex; flex-direction:column; overflow:hidden;
   }
   .backdrop.show .modal{transform:scale(1); opacity:1}
@@ -82,8 +82,6 @@
   .modal h2{margin:0;font-size:16px}
   .close{appearance:none;border:1px solid #2a2a2a;background:#0f0f0f;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
   .modal iframe{border:0;width:100%;height:100%}
-
-  @media (max-width:1280px){.modules{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -107,9 +105,9 @@
       </div>
     </header>
 
-    <!-- ===== Módulos ===== -->
+    <!-- Módulos -->
     <section class="modules">
-      <a class="mod" data-mod="METAS" id="link-metas" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="kpi-metas">—</div><div class="foot"><span class="pill" style="background:#0f0f0f;border:1px solid #1e1e1e">Progresso</span></div></a>
+      <a class="mod" data-mod="METAS" id="link-metas" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="kpi-metas">—</div><div class="foot"><span style="background:#0f0f0f;border:1px solid #1e1e1e" class="pill">Progresso</span></div></a>
       <a class="mod" data-mod="CANCELAMENTOS" id="link-cancel" href="#"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="kpi-cancel">—</div><div class="foot"><span class="pill" style="background:var(--danger)">Risco</span></div></a>
       <a class="mod" data-mod="TRAVAS" id="link-travas" href="#"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="kpi-travas">—</div><div class="foot"><span class="pill" style="background:var(--warn)">Alerta</span></div></a>
       <a class="mod" data-mod="FINANCEIRO" id="link-fin" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="kpi-fin">—</div><div class="foot"><span class="pill" style="background:var(--ok)">Saldo</span></div></a>
@@ -120,17 +118,20 @@
       <a class="mod" data-mod="MIDIAS" id="link-midias" href="#"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi" id="kpi-views">—</div><div class="foot"><span class="pill" style="background:var(--accent)">Engaj.</span></div></a>
     </section>
 
-    <!-- ===== KPIs gerais ===== -->
+    <!-- KPIs gerais -->
     <section class="grid">
       <div class="card" id="card-periodo">
         <h3>Período</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill">Abrir Pop-up</span></div>
+        <div class="kpi-line">
+          <div class="kpi-value" id="kpi-competencia">—</div>
+          <button id="btn-open-popup" class="pill" type="button">Abrir Pop-up</button>
+        </div>
       </div>
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
       <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
     </section>
 
-    <!-- ===== CHARTS ===== -->
+    <!-- CHARTS -->
     <section class="charts">
       <div class="card chart-card"><h3>Timeline geral</h3><canvas id="line-timeline" height="300"></canvas></div>
       <div class="card chart-card"><h3>Dias mais ativos</h3><canvas id="bar-days" height="300"></canvas></div>
@@ -139,50 +140,42 @@
     <div class="subtitle" style="margin-top:16px">Última atualização: <span id="last-update">—</span></div>
   </div>
 
-  <!-- ===== Pop-up interno (iframe do caixa.html) ===== -->
+  <!-- Modal/Pop-up interno -->
   <div id="backdrop" class="backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <header>
         <h2 id="modal-title">Livro de Caixa — Detalhes</h2>
-        <button class="close" id="modal-close">✕</button>
+        <button class="close" id="modal-close" type="button">✕</button>
       </header>
       <iframe id="caixa-frame" src="about:blank" title="Caixa"></iframe>
     </div>
   </div>
 
 <script>
-/* ========= CONFIG ========= */
+/* ===== CONFIG ===== */
 const CONFIG = {
-  IFRAME_PAGE: 'caixa.html', // seu popup renomeado
+  IFRAME_PAGE: 'caixa.html',
   API_URL: 'https://script.google.com/macros/s/AKfycbzqg8GEPFmod6W1xPxneXHAC6LRmnNAastew3QJtMpsf8mWwRowcZKZoNgRQskBM0-p/exec'
 };
-const $ = s => document.querySelector(s);
+const $ = sel => document.querySelector(sel);
 const money = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n||0);
 const toNumber = v => (typeof v==='number') ? v : Number(String(v||'').replace(/[^0-9,-]/g,'').replace(/\./g,'').replace(',','.'))||0;
-const buildUrl = (base,params)=>{const u=new URL(base,window.location.href);Object.entries(params||{}).forEach(([k,v])=>{if(v!=null&&v!=='')u.searchParams.set(k,v)});return u.toString();};
+const buildUrl = (base,params)=>{ const u=new URL(base,location.href); Object.entries(params||{}).forEach(([k,v])=>{ if(v!=null && v!=='') u.searchParams.set(k,v); }); return u.toString(); };
 
-/* ========= CHARTS ========= */
+/* ===== Charts ===== */
 let chartLine, chartBar;
-function makeLine(ctx){return new Chart(ctx,{type:'line',data:{labels:[],datasets:[
+function makeLine(ctx){ return new Chart(ctx,{type:'line',data:{labels:[],datasets:[
   {label:'Entradas',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},
   {label:'Saídas',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}
-]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}}});}
-function makeBar(ctx){return new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#00d1ff'}]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}}});}
+]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}); }
+function makeBar(ctx){ return new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#00d1ff'}]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}}}); }
 
-/* ========= API ========= */
+/* ===== API ===== */
 async function fetchRows(empresa,periodo){
   const r = await fetch(buildUrl(CONFIG.API_URL,{action:'list',empresa,periodo}),{cache:'no-store'});
   if(!r.ok) throw new Error('Falha ao carregar linhas');
   const j = await r.json();
   return Array.isArray(j)?j:(j.items||j.rows||j.data||[]);
-}
-async function fetchHeader(empresa,periodo){
-  // se seu Apps Script tiver action=header/resume, usamos; senão devolvemos null
-  try{
-    const r = await fetch(buildUrl(CONFIG.API_URL,{action:'header',empresa,periodo}),{cache:'no-store'});
-    if(!r.ok) return null;
-    return await r.json();
-  }catch(_){return null}
 }
 function summarize(rows){
   let entradas=0,saidas=0; const byDay=new Map();
@@ -198,10 +191,11 @@ function summarize(rows){
   return {entradas,saidas,labels,serieE:labels.map(k=>byDay.get(k).e),serieS:labels.map(k=>byDay.get(k).s),saldo:entradas-saidas};
 }
 
-/* ========= POP-UP (iframe) ========= */
+/* ===== Modal (iframe) ===== */
 const backdrop = $('#backdrop'), iframe = $('#caixa-frame');
 function currentFilters(){ return { company: $('#empresa').value, periodo: $('#periodo').value }; }
-function openModal(){
+function openModal(ev){
+  if(ev) ev.preventDefault();
   iframe.src = buildUrl(CONFIG.IFRAME_PAGE, currentFilters());
   backdrop.classList.add('show');
   backdrop.setAttribute('aria-hidden','false');
@@ -210,39 +204,26 @@ function closeModal(){
   backdrop.classList.remove('show');
   backdrop.setAttribute('aria-hidden','true');
 }
+function syncIframeIfOpen(){ if(backdrop.classList.contains('show')) iframe.src = buildUrl(CONFIG.IFRAME_PAGE, currentFilters()); }
 backdrop.addEventListener('click', e=>{ if(e.target===backdrop) closeModal(); });
 $('#modal-close').addEventListener('click', closeModal);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
-function syncIframeIfOpen(){ if(backdrop.classList.contains('show')) iframe.src = buildUrl(CONFIG.IFRAME_PAGE, currentFilters()); }
 
-/* ========= LOAD ========= */
+/* ===== Load ===== */
 async function loadIndex(){
   const emp=$('#empresa').value, per=$('#periodo').value;
   $('#kpi-competencia').textContent = per.split('-').reverse().join('/');
 
   try{
-    const [rows, header] = await Promise.all([ fetchRows(emp,per), fetchHeader(emp,per) ]);
+    const rows = await fetchRows(emp,per);
     const s = summarize(rows);
 
-    // KPIs reais
-    $('#kpi-fin').textContent  = money(s.saldo);
-    $('#kpi-cancel').textContent = '—';
-    $('#kpi-travas').textContent = '—';
-    $('#kpi-metas').textContent  = '—';
-    $('#kpi-delivery').textContent = '—';
-    $('#kpi-bank').textContent = '—';
-    $('#kpi-nps').textContent = '—';
-    $('#kpi-views').textContent = '—';
-
-    // Saldo na loja (do cabeçalho, se vier)
-    const saldoImpl = toNumber(header?.saldoImplantacao ?? header?.saldo_implantacao);
-    const saldoLoja = header?.saldoNaLoja ?? header?.saldo_na_loja ?? (saldoImpl + s.entradas - s.saidas);
-    const kLoja = document.getElementById('kpi-saldo-loja');
-    if(kLoja){ kLoja.textContent = money(toNumber(saldoLoja)); }
+    // KPIs essenciais
+    $('#kpi-fin').textContent = money(s.saldo);
 
     // Gráficos
-    if(!chartLine) chartLine = makeLine(document.getElementById('line-timeline'));
-    if(!chartBar)  chartBar  = makeBar(document.getElementById('bar-days'));
+    if(!chartLine) chartLine = makeLine($('#line-timeline'));
+    if(!chartBar)  chartBar  = makeBar($('#bar-days'));
 
     const labelsBR = s.labels.map(x=>x.split('-').reverse().join('/'));
     chartLine.data.labels = labelsBR;
@@ -261,7 +242,7 @@ async function loadIndex(){
   }
 }
 
-/* ========= INIT ========= */
+/* ===== Init ===== */
 function init(){
   const month = new Date().toISOString().slice(0,7);
   $('#periodo').value = month;
@@ -270,10 +251,14 @@ function init(){
   chartLine = makeLine($('#line-timeline'));
   chartBar  = makeBar($('#bar-days'));
 
-  // Abre pop-up (iframe) no card Período
-  $('#card-periodo').addEventListener('click', openModal);
+  // abrir pop-up (dois gatilhos)
+  $('#btn-open-popup').addEventListener('click', openModal);
+  $('#card-periodo').addEventListener('click', e=>{
+    // evita duplo clique quando o alvo já é o botão
+    if(!(e.target && e.target.id==='btn-open-popup')) openModal(e);
+  });
 
-  // Filtros
+  // filtros
   $('#btn-refresh').addEventListener('click', ()=>{ loadIndex(); syncIframeIfOpen(); });
   $('#empresa').addEventListener('change', ()=>{ loadIndex(); syncIframeIfOpen(); });
   $('#periodo').addEventListener('change', ()=>{ 
