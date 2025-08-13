@@ -39,24 +39,40 @@
     .card-click:hover{transform:translateY(-2px)}
     .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
     .kpi-line{display:flex;align-items:center;justify-content:space-between}
-    .kpi-value{font-size:28px;font-weight:700}
+    .kpi-value{font-size:28px;font-weight:700;min-height:34px}
     .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
     .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
     .chart-card{padding:18px} canvas{width:100%;height:100%}
+
+    /* Loading & toast */
+    .spinner{width:16px;height:16px;border:2px solid #2a2a2a;border-top-color:var(--primary);border-radius:50%;display:inline-block;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading{color:var(--muted)}
+    .overlay{
+      position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(1px)
+    }
+    .overlay.show{display:grid}
+    .toast{
+      position:fixed;right:18px;bottom:18px;background:#111;border:1px solid #2a2a2a;color:var(--ink);
+      padding:10px 12px;border-radius:12px;box-shadow:var(--shadow);display:none;max-width:min(90vw,460px);z-index:9999
+    }
+    .toast.show{display:block;animation:fadeIn .15s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    /* Modal */
     .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(4px);z-index:999}
     .modal-backdrop.show{display:grid !important;animation:fadeIn .18s ease-out}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    .modal{width:min(1100px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow)}
+    .modal{width:min(1100px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow);position:relative}
     .modal header{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:rgba(17,17,17,.9);border-bottom:1px solid #1f1f1f}
     .modal h2{margin:0;font-size:18px;letter-spacing:.2px}
     .modal .close{appearance:none;border:1px solid #2a2a2a;background:#0f0f0f;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
-    .modal .content{padding:18px}
+    .modal .content{padding:18px;position:relative}
     .modal .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
     .modal .filters select,.modal .filters input{background:var(--soft);border:1px solid #232323;color:var(--ink);padding:10px 12px;border-radius:12px}
     .modal .kpis{display:grid;gap:14px;grid-template-columns:repeat(4,1fr);margin-top:12px}
     .modal .kpis .k{background:#0f0f0f;border:1px solid #1f1f1f;border-radius:14px;padding:12px 14px}
     .modal .k .label{color:var(--muted);font-size:12px}
-    .modal .k .val{font-size:22px;font-weight:800;margin-top:4px}
+    .modal .k .val{font-size:22px;font-weight:800;margin-top:4px;min-height:28px}
     .modal .charts{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:12px}
     .modal .chart-card{background:#0f0f0f;border:1px solid #1f1f1f;border-radius:14px;padding:14px 14px 10px}
     .modal footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid #1f1f1f;background:rgba(17,17,17,.9);position:sticky;bottom:0}
@@ -103,10 +119,11 @@
 
     <section class="grid">
       <div class="card card-click" id="card-periodo">
+        <div class="overlay" id="card-loader"><div><span class="spinner"></span> <span class="loading">Carregando…</span></div></div>
         <h3>Saldo na Loja (mês)</h3>
         <div class="kpi-line">
           <div class="kpi-value" id="kpi-competencia">—</div>
-          <span class="pill">Detalhar</span>
+          <span class="pill" id="pill-detalhar">Detalhar</span>
         </div>
         <div class="subtitle" id="lbl-periodo" style="margin-top:6px;color:var(--muted);font-size:12px">—</div>
       </div>
@@ -131,6 +148,8 @@
         <button class="close" id="modal-close" aria-label="Fechar (Esc)">✕</button>
       </header>
       <div class="content">
+        <div class="overlay" id="modal-loader"><div><span class="spinner"></span> <span class="loading">Carregando…</span></div></div>
+
         <div class="filters">
           <select id="modal-empresa">
             <option value="TODAS">Todas as empresas</option>
@@ -166,6 +185,8 @@
     </div>
   </div>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
 /* ========= CONFIG ========= */
 const CONFIG = {
@@ -180,6 +201,15 @@ const CONFIG = {
 const $ = s => document.querySelector(s);
 const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 
+/* ========= HELPERS (UI) ========= */
+function showToast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 4000); }
+function setBtnLoading(btn, on, label='Atualizar'){
+  if(on){ btn.disabled=true; btn.dataset.prev=btn.textContent; btn.textContent='Carregando…'; btn.setAttribute('aria-busy','true'); }
+  else { btn.disabled=false; btn.textContent=btn.dataset.prev || label; btn.removeAttribute('aria-busy'); }
+}
+function showCardLoader(on){ $('#card-loader').classList.toggle('show', !!on); }
+function showModalLoader(on){ $('#modal-loader').classList.toggle('show', !!on); }
+
 /* ========= FETCH ========= */
 function buildUrl(base, empresa, periodo){
   if(!base) return '';
@@ -190,16 +220,17 @@ function buildUrl(base, empresa, periodo){
 }
 async function fetchJSON(url){
   const r = await fetch(url, { headers:{'cache-control':'no-cache'} });
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  return r.json();
+  const text = await r.text();
+  try { return JSON.parse(text); }
+  catch(e){ console.error('Resposta não é JSON', {status:r.status, body:text.slice(0,500)}); throw new Error('A API não retornou JSON'); }
 }
 
 /* ========= ADAPTER ========= */
 async function getFinanceiro(empresa,periodo){
-  if(!CONFIG.APIS.FINANCEIRO) return null;
+  if(!CONFIG.APIS.FINANCEIRO) throw new Error('API não configurada');
   const url = buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo);
   const data = await fetchJSON(url);
-  if(data && data.ok === false) throw new Error(data.error||'Falha script');
+  if(data && data.ok === false) throw new Error(data.error||'Falha no Apps Script');
   return {
     saldoLoja: Number(data.saldoLoja||0),
     entradas: Number(data.totais?.entradas||0),
@@ -225,16 +256,24 @@ function makeBar(ctx){
 async function loadFinanceiroToCard(){
   const emp = $('#empresa').value;
   const per = $('#periodo').value;
+  const btn = $('#btn-refresh');
+
+  showCardLoader(true);
+  setBtnLoading(btn, true);
+
   try{
     const fin = await getFinanceiro(emp, per);
-    if(!fin) throw new Error('API não configurada');
     $('#kpi-competencia').textContent = fmt.format(fin.saldoLoja||0);
     $('#lbl-periodo').textContent = `Período: ${per.split('-').reverse().join('/')}`;
     window.__FIN_CACHE__ = {emp, per, fin};
   }catch(err){
     console.error('Erro FINANCEIRO:', err);
     $('#kpi-competencia').textContent = '—';
-    $('#lbl-periodo').textContent = '—';
+    $('#lbl-periodo').textContent = 'Falha ao carregar';
+    showToast('Erro ao carregar resumo financeiro: ' + (err.message||err));
+  }finally{
+    showCardLoader(false);
+    setBtnLoading(btn, false);
   }
 }
 
@@ -279,34 +318,46 @@ function closeModal(){ const $b=$('#modal-backdrop'); $b.classList.remove('show'
 async function refreshModal(){
   const empresa = $('#modal-empresa').value;
   const periodo = $('#modal-periodo').value;
-  const fin = await getFinanceiro(empresa, periodo);
 
-  $('#kpi-a').textContent = fmt.format(fin.entradas||0);
-  $('#kpi-b').textContent = fmt.format(fin.saidas||0);
-  $('#kpi-c').textContent = fmt.format(fin.saldoMes||0);
-  $('#kpi-d').textContent = fmt.format(fin.saldoLoja||0);
+  showModalLoader(true);
+  try{
+    const fin = await getFinanceiro(empresa, periodo);
 
-  const tb = $('#livro-tabela tbody'); tb.innerHTML='';
-  fin.lancamentos.forEach(l=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${l.data||''}</td><td>${l.historico||''}</td><td>${l.complemento||''}</td>
-                    <td class="num in">${Number(l.entrada||0)?fmt.format(l.entrada):''}</td>
-                    <td class="num out">${Number(l.saida||0)?fmt.format(l.saida):''}</td>`;
-    tb.appendChild(tr);
-  });
+    $('#kpi-a').textContent = fmt.format(fin.entradas||0);
+    $('#kpi-b').textContent = fmt.format(fin.saidas||0);
+    $('#kpi-c').textContent = fmt.format(fin.saldoMes||0);
+    $('#kpi-d').textContent = fmt.format(fin.saldoLoja||0);
 
-  const labels = fin.serie.map(p=>p.dia);
-  const saldo  = fin.serie.map(p=>p.saldo);
-  const movs   = fin.serie.map(p=>p.movimentos);
-  MODAL.line.data.labels = labels; MODAL.line.data.datasets[0].data = saldo; MODAL.line.update();
-  MODAL.bar.data.labels = labels;  MODAL.bar.data.datasets[0].data  = movs;  MODAL.bar.update();
+    const tb = $('#livro-tabela tbody'); tb.innerHTML='';
+    fin.lancamentos.forEach(l=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${l.data||''}</td><td>${l.historico||''}</td><td>${l.complemento||''}</td>
+                      <td class="num in">${Number(l.entrada||0)?fmt.format(l.entrada):''}</td>
+                      <td class="num out">${Number(l.saida||0)?fmt.format(l.saida):''}</td>`;
+      tb.appendChild(tr);
+    });
+
+    const labels = fin.serie.map(p=>p.dia);
+    const saldo  = fin.serie.map(p=>p.saldo);
+    const movs   = fin.serie.map(p=>p.movimentos);
+    MODAL.line.data.labels = labels; MODAL.line.data.datasets[0].data = saldo; MODAL.line.update();
+    MODAL.bar.data.labels = labels;  MODAL.bar.data.datasets[0].data  = movs;  MODAL.bar.update();
+  }catch(err){
+    showToast('Erro ao carregar detalhes: ' + (err.message||err));
+    ['kpi-a','kpi-b','kpi-c','kpi-d'].forEach(id=>$('#'+id).textContent='—');
+    $('#livro-tabela tbody').innerHTML = '';
+  }finally{
+    showModalLoader(false);
+  }
 }
 
 /* ========= BOOT ========= */
 document.addEventListener('DOMContentLoaded', ()=>{
+  // MÊS ATUAL como padrão
   $('#periodo').value = new Date().toISOString().slice(0,7);
   $('#lbl-periodo').textContent = `Período: ${$('#periodo').value.split('-').reverse().join('/')}`;
   $('#last-update').textContent = new Date().toLocaleString('pt-BR');
+
   bootstrapCharts();
   loadFinanceiroToCard();
 
