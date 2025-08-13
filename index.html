@@ -12,10 +12,14 @@
     :root{ --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2; --primary:#00d1ff; --accent:#ff2e88; --ok:#37d399; --warn:#fec84b; --danger:#f43f5e; --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45); }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:
-      radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
-      radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
-      var(--bg); color:var(--ink); }
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background:
+        radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+        radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
+        var(--bg);
+      color:var(--ink);
+    }
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
     .title{font-size:28px;font-weight:700;letter-spacing:.3px}
@@ -40,10 +44,12 @@
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
     .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer}
     .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
-    .kpi-line{display:flex;align-items:center;justify-content:space-between}
+    .kpi-line{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .kpi-value{font-size:28px;font-weight:700}
-    .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
+    .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:6px 10px;border-radius:999px;font-weight:700;white-space:nowrap}
+    .pill.ok{background:var(--ok);color:#04130a}
 
+    .actions{display:flex;gap:8px;align-items:center}
     .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
     .chart-card{padding:18px}
     canvas{width:100%;height:100%}
@@ -86,7 +92,13 @@
     <section class="grid">
       <div class="card" id="card-periodo">
         <h3>Período</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill">Abrir Pop-up</span></div>
+        <div class="kpi-line">
+          <div class="kpi-value" id="kpi-competencia">—</div>
+          <div class="actions">
+            <span class="pill" id="btn-open">Abrir Pop-up</span>
+            <span class="pill ok">Saldo Loja: <span id="kpi-saldo-loja">—</span></span>
+          </div>
+        </div>
       </div>
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
       <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
@@ -104,8 +116,10 @@
 <script>
 /* ====== CONFIG (DADO REAL) ====== */
 const CONFIG = {
+  // sua página de detalhes
   POPUP_URL: 'popup.html',
-  API_URL: 'https://script.google.com/macros/s/AKfycbzyDEyvj-kp7LOA5eROafSg2KFkCoVK-AWr-WNteC31rMPfpJlos-ubzx1zWTcwkQN6/exec'
+  // endpoint que você passou
+  API_URL: 'https://script.google.com/macros/s/AKfycbxf3uL0xzvhgJgyuLcRqid9UWf8bm2-g3zSsNOYa3hJFasDar2fu9VQ7rh48koNS7wU/exec'
 };
 const $ = s => document.querySelector(s);
 
@@ -118,9 +132,7 @@ function toNumber(v){
 }
 function buildUrl(base, params){
   const u = new URL(base);
-  Object.entries(params||{}).forEach(([k,v])=>{
-    if(v!=null && v!=='') u.searchParams.set(k,v);
-  });
+  Object.entries(params||{}).forEach(([k,v])=>{ if(v!=null && v!=='') u.searchParams.set(k,v); });
   return u.toString();
 }
 
@@ -144,14 +156,18 @@ function makeBar(ctx){ return new Chart(ctx,{
 
 /* ====== POP-UP SYNC ====== */
 let popupWin = null;
-function currentFilters(){ return { company: $('#empresa').value, periodo: $('#periodo').value }; }
+// Enviamos tanto empresa quanto company para compatibilidade
+function currentFilters(){
+  const empresa = $('#empresa').value, periodo = $('#periodo').value;
+  return { empresa, company: empresa, periodo };
+}
 function openPopup(e){
   e && e.preventDefault && e.preventDefault();
   const qs = new URLSearchParams(currentFilters()).toString();
   const url = CONFIG.POPUP_URL + '?' + qs;
   const w = window.open(url, 'popup_livro_caixa', 'width=1200,height=800,menubar=no,toolbar=no,location=no');
   popupWin = w && !w.closed ? w : null;
-  if(!popupWin) window.location.href = url; // fallback se popup bloqueado
+  if(!popupWin) window.location.href = url; // fallback
 }
 function syncFiltersToPopup(){
   if(popupWin && !popupWin.closed){
@@ -160,12 +176,18 @@ function syncFiltersToPopup(){
 }
 
 /* ====== DATA (API REAL) ====== */
-async function fetchMovements(empresa, periodo){
+async function fetchDados(empresa, periodo){
   const url = buildUrl(CONFIG.API_URL, { action:'list', empresa, periodo });
   const r = await fetch(url, { cache:'no-store' });
   if(!r.ok) throw new Error('Falha ao carregar movimentos');
   const data = await r.json();
-  return Array.isArray(data) ? data : (data.items || data.rows || []);
+  // linhas
+  const rows = Array.isArray(data) ? data : (data.items || data.rows || []);
+  // header robusto (vários nomes possíveis)
+  const headerSaldoLoja = toNumber(
+    (data && (data.saldo_loja ?? data.SaldoLoja ?? data.saldoLoja ?? data.saldo_loja_loja)) || 0
+  );
+  return { rows, headerSaldoLoja };
 }
 function summarize(rows){
   let entradas = 0, saidas = 0;
@@ -190,15 +212,21 @@ async function loadIndex(){
   const empresa = $('#empresa').value;
   const periodo = $('#periodo').value;
   try{
-    const rows = await fetchMovements(empresa, periodo);
+    const { rows, headerSaldoLoja } = await fetchDados(empresa, periodo);
     const s = summarize(rows);
 
-    // Período (mostra mês) e saldo no módulo Financeiro
+    // Período
     $('#kpi-competencia').textContent = periodo.split('-').reverse().join('/');
+
+    // Saldo na Loja (preferir o valor vindo do endpoint; senão, calculado)
+    const saldoLoja = headerSaldoLoja || s.saldo;
+    $('#kpi-saldo-loja').textContent = fmtBR.format(saldoLoja);
+
+    // Módulo Financeiro com saldo calculado (mantido)
     const elFin = document.getElementById('kpi-fin');
     if(elFin) elFin.textContent = fmtBR.format(s.saldo);
 
-    // Gráficos reais
+    // Gráficos
     if(!chartLine) chartLine = makeLine(document.getElementById('line-timeline'));
     if(!chartBar)  chartBar  = makeBar(document.getElementById('bar-days'));
 
@@ -214,6 +242,7 @@ async function loadIndex(){
     $('#last-update').textContent = new Date().toLocaleString('pt-BR');
   }catch(err){
     console.error(err);
+    $('#kpi-saldo-loja').textContent = '—';
     const elFin = document.getElementById('kpi-fin');
     if(elFin) elFin.textContent = '—';
   }
@@ -228,9 +257,11 @@ function init(){
   chartLine = makeLine(document.getElementById('line-timeline'));
   chartBar  = makeBar(document.getElementById('bar-days'));
 
+  // Clique no card ou no chip para abrir o pop-up
   document.getElementById('card-periodo').addEventListener('click', openPopup);
-  document.getElementById('btn-refresh').addEventListener('click', ()=>{ loadIndex(); syncFiltersToPopup(); });
+  document.getElementById('btn-open').addEventListener('click', openPopup);
 
+  document.getElementById('btn-refresh').addEventListener('click', ()=>{ loadIndex(); syncFiltersToPopup(); });
   document.getElementById('empresa').addEventListener('change', ()=>{ loadIndex(); syncFiltersToPopup(); });
   document.getElementById('periodo').addEventListener('change', ()=>{ 
     $('#kpi-competencia').textContent = $('#periodo').value.split('-').reverse().join('/'); 
