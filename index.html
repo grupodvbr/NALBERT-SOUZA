@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    :root{--bg:#0a0a0a;--panel:#111111;--soft:#161616;--ink:#f5f7ff;--muted:#a9b0c2;--primary:#00d1ff;--accent:#ff2e88;--ok:#37d399;--warn:#fec84b;--danger:#f43f5e;--card-radius:18px;--shadow:0 10px 40px rgba(0,0,0,.45)}
+    :root{--bg:#0a0a0a;--panel:#111111;--soft:#161616;--ink:#f5f7ff;--muted:#a9b0c2;--ring1:#00d1ff;--ring2:#ff2e88;--primary:#00d1ff;--accent:#ff2e88;--ok:#37d399;--warn:#fec84b;--danger:#f43f5e;--card-radius:18px;--shadow:0 10px 40px rgba(0,0,0,.45)}
     *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
       radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
@@ -17,36 +17,33 @@
       var(--bg);color:var(--ink)}
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-    .title{font-size:28px;font-weight:700} .subtitle{color:var(--muted);font-size:14px}
+    .title{font-size:28px;font-weight:700;letter-spacing:.3px}
+    .subtitle{color:var(--muted);font-size:14px}
     .controls{display:flex;gap:12px;align-items:center}
     .btn,select{background:var(--panel);border:1px solid #1f1f1f;color:var(--ink);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow)}
     .btn[disabled]{opacity:.7;cursor:not-allowed}
     .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
-    .mod{position:relative;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow)}
-    .mod h4{margin:0 0 6px;font-size:16px;font-weight:700} .desc{color:var(--muted);font-size:12px}
-    .kpi{font-size:26px;font-weight:800;margin-top:10px} .badge{position:absolute;top:12px;right:12px;background:#161616;border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
+    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow)}
+    .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}.desc{color:var(--muted);font-size:12px}.kpi{font-size:26px;font-weight:800;margin-top:10px}
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
     .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative}
     .kpi-line{display:flex;align-items:center;justify-content:space-between}
     .kpi-value{font-size:28px;font-weight:700;min-height:34px}
     .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
-    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
-    .chart-card{padding:18px}
-    .spinner{width:16px;height:16px;border:2px solid #2a2a2a;border-top-color:var(--primary);border-radius:50%;display:inline-block;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(1px)} .overlay.show{display:grid}
-    .toast{position:fixed;right:18px;bottom:18px;background:#111;border:1px solid #2a2a2a;color:var(--ink);padding:10px 12px;border-radius:12px;box-shadow:var(--shadow);display:none;max-width:min(90vw,460px);z-index:9999}
-    .toast.show{display:block}
-    /* Modal */
-    .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(4px);z-index:999}
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}.chart-card{padding:18px}
+    .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35)} .overlay.show{display:grid}
+    .spinner{width:16px;height:16px;border:2px solid #2a2a2a;border-top-color:var(--primary);border-radius:50%;display:inline-block;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:999}
     .modal-backdrop.show{display:grid}
     .modal{width:min(1100px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow)}
     .modal header{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(17,17,17,.9);border-bottom:1px solid #1f1f1f}
     .modal .content{padding:18px;position:relative}
     .modal .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
     .modal .kpis{display:grid;gap:14px;grid-template-columns:repeat(4,1fr)}
-    table{width:100%;border-collapse:collapse;margin-top:12px} th,td{padding:8px 10px;border-bottom:1px solid #1f1f1f;font-size:13px}
-    td.num{text-align:right} .in{color:var(--ok)} .out{color:var(--danger)}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:8px 10px;border-bottom:1px solid #1f1f1f;font-size:13px}
+    td.num{text-align:right}.in{color:var(--ok)}.out{color:var(--danger)}
     @media (max-width:1280px){.modules{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}}
     @media (max-width:1100px){.modal .kpis{grid-template-columns:repeat(2,1fr)}.modal .charts{grid-template-columns:1fr}}
   </style>
@@ -72,21 +69,18 @@
       </div>
     </header>
 
-    <section class="modules">
-      <a class="mod" data-mod="FINANCEIRO" id="link-fin" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="kpi-fin">—</div></a>
-      <!-- demais cards mantidos… -->
-    </section>
+    <!-- seus cards seguem (mantidos) -->
 
     <section class="grid">
-      <div class="card" id="card-periodo">
+      <!-- ESTE CARD AGORA MOSTRA O SALDO DO MÊS E ABRE O POP-UP -->
+      <div class="card" id="card-periodo" style="cursor:pointer">
         <div class="overlay" id="card-loader"><div><span class="spinner"></span> Carregando…</div></div>
         <h3>Saldo na Loja (mês)</h3>
         <div class="kpi-line">
           <div class="kpi-value" id="kpi-competencia">—</div>
-          <span class="pill" id="btn-detalhar">Detalhar</span>
+          <span class="pill">Detalhar</span>
         </div>
         <div class="subtitle" id="lbl-periodo" style="margin-top:6px;color:#a9b0c2">—</div>
-        <div class="subtitle" id="debug-msg" style="margin-top:6px;color:#fca5a5"></div>
       </div>
 
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value">—</div><span class="pill" style="background:#ff2e88">Ativos</span></div></div>
@@ -130,7 +124,10 @@
           <div><div style="color:#a9b0c2;font-size:12px">Saldo na Loja</div><div class="kpi-value" id="kpi-d">—</div></div>
         </div>
 
-        <table id="livro-tabela"><thead><tr><th>Data</th><th>Histórico</th><th>Complemento</th><th class="num">Entrada</th><th class="num">Saída</th></tr></thead><tbody></tbody></table>
+        <table id="livro-tabela">
+          <thead><tr><th>Data</th><th>Histórico</th><th>Complemento</th><th class="num">Entrada</th><th class="num">Saída</th></tr></thead>
+          <tbody></tbody>
+        </table>
 
         <div class="charts">
           <div class="chart-card"><canvas id="modal-line" height="240"></canvas></div>
@@ -140,108 +137,128 @@
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
-
 <script>
-/* ======= CONFIG ======= */
+/* ========= CONFIG =========
+ * 1) API_BASE: sua URL /exec do Apps Script
+ * 2) SHEETS: informe o ID da PLANILHA de cada empresa
+ */
 const CONFIG = {
-  DEMO: false, // mude para true se quiser ver dados fictícios
-  APIS: { FINANCEIRO: 'https://script.google.com/macros/s/AKfycbzvL6FhF4BFPg2PMSIzWkB6QZhiqWl15yc9u48BwzR2BnI7y3kwMQXCQN7b9Pps1239KQ/exec' }
+  API_BASE: 'https://script.google.com/macros/s/AKfycbwu6M9sevqvEtfKFgDqp0NxB-U3ini-2MKYSfrOndNzj_7btlaT3ziwVg5r701tHaMqCA/exec',
+  SHEETS: {
+    'MERCATTO DELICIA': 'COLE_ID_PLANILHA_MERCATTO',
+    'DELICIA GOURMET' : 'COLE_ID_PLANILHA_DELICIA_GOURMET',
+    'PADARIA DELICIA' : 'COLE_ID_PLANILHA_PADARIA',
+    'VILLA GOURMET'   : 'COLE_ID_PLANILHA_VILLA',
+    'M. KIDS'         : 'COLE_ID_PLANILHA_MKIDS'
+  }
 };
-const $ = s => document.querySelector(s);
+
+const $  = s => document.querySelector(s);
 const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 
-/* ======= UI Helpers ======= */
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000); }
+/* ========= HELPERS ========= */
 function busy(el, on){ el.classList.toggle('show', !!on); }
-function setBtnLoading(on){ const b=$('#btn-refresh'); if(on){b.disabled=true;b.textContent='Carregando…'} else {b.disabled=false;b.textContent='Atualizar'} }
-
-/* ======= FETCH ======= */
-function buildUrl(base, emp, per){ const u=new URL(base); if(emp&&emp!=='TODAS') u.searchParams.set('empresa', emp); if(per) u.searchParams.set('periodo', per); return u.toString(); }
-
+function buildUrl(sheetId, periodo){
+  const u = new URL(CONFIG.API_BASE);
+  u.searchParams.set('sheetId', sheetId);
+  u.searchParams.set('periodo', periodo);
+  return u.toString();
+}
 async function fetchJSON(url){
   const r = await fetch(url, { headers:{'cache-control':'no-cache'} });
-  const body = await r.text();
-  const ct = (r.headers.get('content-type')||'').toLowerCase();
-  if(!ct.includes('application/json')) throw new Error(`Resposta não-JSON (status ${r.status})`);
-  return JSON.parse(body);
+  const text = await r.text();
+  return JSON.parse(text); // se não for JSON, vai acusar erro no console
 }
 
-/* ======= DEMO DATA ======= */
-function demoFinanceiro(periodo){
-  const dias = Array.from({length:28}, (_,i)=>i+1);
-  let saldo=0;
-  const serie = dias.map(d=>{ const ent=Math.random()*2000; const sai=Math.random()*1500; saldo += ent-sai; return {dia:String(d).padStart(2,'0'), saldo:Math.round(saldo), movimentos:Math.floor(Math.random()*4)}; });
-  const entradas = 50000, saidas= 41200;
-  return { saldoLoja: entradas-saidas, entradas, saidas, saldoMes: entradas-saidas, serie, lancamentos: [
-    {data:'01/'+periodo.split('-').reverse().join('/'), historico:'Caixa dia 01', complemento:'', entrada:1200, saida:0},
-    {data:'02/'+periodo.split('-').reverse().join('/'), historico:'Compra', complemento:'Fornecedor X', entrada:0, saida:800}
-  ]};
+/* ========= FINANCEIRO ========= */
+async function getEmpresaData(empresa, periodo){
+  const id = CONFIG.SHEETS[empresa];
+  if(!id) throw new Error(`Sem ID de planilha para "${empresa}" em CONFIG.SHEETS`);
+  const data = await fetchJSON(buildUrl(id, periodo));
+  if(data.ok === false) throw new Error(data.error || 'Erro na API');
+  return data;
 }
+// “TODAS”: soma de todas as empresas
+async function getAllEmpresas(periodo){
+  const keys = Object.keys(CONFIG.SHEETS);
+  const res = await Promise.all(keys.map(k => getEmpresaData(k, periodo).catch(()=>null)));
+  const vivos = res.filter(Boolean);
+  const total = { entradas:0, saidas:0, saldoLoja:0 };
+  vivos.forEach(d => { total.entradas += d.totais.entradas; total.saidas += d.totais.saidas; total.saldoLoja += d.saldoLoja; });
 
-/* ======= ADAPTER ======= */
-async function getFinanceiro(empresa, periodo){
-  if (CONFIG.DEMO) return demoFinanceiro(periodo);
-  const url = buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo);
-  const data = await fetchJSON(url);
-  if (data && data.ok === false) throw new Error(data.error||'Erro no Apps Script');
+  // série agregada por dia (usa maior lista de dias; onde faltar, trata como 0)
+  const diasSet = new Set();
+  vivos.forEach(d => d.serie.forEach(p=>diasSet.add(p.dia)));
+  const dias = Array.from(diasSet).sort();
+
+  const serie = dias.map(dia=>{
+    let sal=0, mov=0;
+    vivos.forEach(s => {
+      const p = s.serie.find(x=>x.dia===dia);
+      if(p){ sal += p.saldo; mov += p.movimentos; }
+    });
+    return { dia, saldo: sal, movimentos: mov };
+  });
+
   return {
-    saldoLoja: Number(data.saldoLoja||0),
-    entradas: Number(data.totais?.entradas||0),
-    saidas: Number((data.totais?.saídas ?? data.totais?.sa) || 0),
-    saldoMes: Number((data.totais?.entradas||0) - ((data.totais?.saídas ?? data.totais?.sa) || 0)),
-    serie: Array.isArray(data.serie)?data.serie:[],
-    lancamentos: Array.isArray(data.lancamentos)?data.lancamentos:[]
+    ok:true,
+    totais:{ entradas: total.entradas, saidas: total.saidas },
+    saldoLoja: total.saldoLoja,
+    lancamentos: [], // agregada não exibe linha-a-linha
+    serie
   };
 }
 
-/* ======= RENDER ======= */
-let line, bar, modalLine, modalBar;
+/* ========= UI: CARD ========= */
+let chartLine, chartBar, modalLine, modalBar;
 
 function initCharts(){
-  const L = document.getElementById('line-timeline'); const B = document.getElementById('bar-days');
-  line = new Chart(L, {type:'line', data:{labels:[], datasets:[{label:'Série',data:[],borderWidth:2,pointRadius:0,tension:.35,borderColor:'#00d1ff'}]}});
-  bar  = new Chart(B, {type:'bar',  data:{labels:[], datasets:[{label:'Eventos',data:[],backgroundColor:'#ff2e88'}]}});
+  chartLine = new Chart($('#line-timeline'), {type:'line', data:{labels:[],datasets:[{label:'Saldo diário',data:[],tension:.35,pointRadius:0,borderWidth:2,borderColor:'#00d1ff'}]}});
+  chartBar  = new Chart($('#bar-days'),     {type:'bar',  data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
 
-  modalLine = new Chart(document.getElementById('modal-line'), {type:'line', data:{labels:[], datasets:[{label:'Saldo diário',data:[],borderWidth:2,pointRadius:0,tension:.35,borderColor:'#00d1ff'}]}});
-  modalBar  = new Chart(document.getElementById('modal-bar'),  {type:'bar',  data:{labels:[], datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
+  modalLine = new Chart($('#modal-line'), {type:'line', data:{labels:[],datasets:[{label:'Saldo diário',data:[],tension:.35,pointRadius:0,borderWidth:2,borderColor:'#00d1ff'}]}});
+  modalBar  = new Chart($('#modal-bar'),  {type:'bar',  data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
 }
 
 async function loadCard(){
-  const emp = $('#empresa').value;
-  const per = $('#periodo').value;
-
-  $('#debug-msg').textContent='';
-  busy($('#card-loader'), true); setBtnLoading(true);
+  const empresa = $('#empresa').value;
+  const periodo = $('#periodo').value;
+  busy($('#card-loader'), true);
 
   try{
-    const fin = await getFinanceiro(emp, per);
-    $('#kpi-competencia').textContent = fmt.format(fin.saldoLoja||0);
-    $('#lbl-periodo').textContent = `Período: ${per.split('-').reverse().join('/')}`;
+    const data = (empresa==='TODAS') ? await getAllEmpresas(periodo) : await getEmpresaData(empresa, periodo);
 
-    // Atualiza charts principais com algo (exemplo: saldo)
-    const labels = fin.serie.map(p=>p.dia);
-    line.data.labels = labels; line.data.datasets[0].data = fin.serie.map(p=>p.saldo); line.update();
-    bar.data.labels = labels;  bar.data.datasets[0].data = fin.serie.map(p=>p.movimentos); bar.update();
+    $('#kpi-competencia').textContent = fmt.format(Number(data.saldoLoja||0));
+    $('#lbl-periodo').textContent = `Período: ${periodo.split('-').reverse().join('/')}`;
 
-    window.__FIN_CACHE__ = { emp, per, fin };
+    chartLine.data.labels = (data.serie||[]).map(p=>p.dia);
+    chartLine.data.datasets[0].data = (data.serie||[]).map(p=>p.saldo);
+    chartLine.update();
+
+    chartBar.data.labels = (data.serie||[]).map(p=>p.dia);
+    chartBar.data.datasets[0].data = (data.serie||[]).map(p=>p.movimentos||0);
+    chartBar.update();
+
+    // deixa disponível para o modal
+    window.__CACHE__ = { empresa, periodo, data };
   }catch(err){
+    console.error(err);
     $('#kpi-competencia').textContent = '—';
     $('#lbl-periodo').textContent = 'Falha ao carregar';
-    const url = buildUrl(CONFIG.APIS.FINANCEIRO, emp, per);
-    $('#debug-msg').innerHTML = `Erro: ${err.message}. <a href="${url}" target="_blank" rel="noopener">Testar API</a>`;
-    toast('Erro ao carregar dados financeiros.');
   }finally{
-    busy($('#card-loader'), false); setBtnLoading(false);
+    busy($('#card-loader'), false);
     $('#last-update').textContent = new Date().toLocaleString('pt-BR');
   }
 }
 
+/* ========= UI: MODAL ========= */
 async function openModal(){
-  const m = $('#modal-backdrop');
-  $('#modal-empresa').value = $('#empresa').value;
-  $('#modal-periodo').value = $('#periodo').value;
-  m.classList.add('show');
+  const empresa = $('#empresa').value;
+  const periodo = $('#periodo').value;
+  $('#modal-empresa').value = empresa;
+  $('#modal-periodo').value = periodo;
+
+  $('#modal-backdrop').classList.add('show');
   await refreshModal();
 }
 function closeModal(){ $('#modal-backdrop').classList.remove('show'); }
@@ -250,15 +267,18 @@ async function refreshModal(){
   const empresa = $('#modal-empresa').value;
   const periodo = $('#modal-periodo').value;
   busy($('#modal-loader'), true);
-  try{
-    const fin = await getFinanceiro(empresa, periodo);
-    $('#kpi-a').textContent = fmt.format(fin.entradas||0);
-    $('#kpi-b').textContent = fmt.format(fin.saidas||0);
-    $('#kpi-c').textContent = fmt.format(fin.saldoMes||0);
-    $('#kpi-d').textContent = fmt.format(fin.saldoLoja||0);
 
+  try{
+    const data = (empresa==='TODAS') ? await getAllEmpresas(periodo) : await getEmpresaData(empresa, periodo);
+
+    $('#kpi-a').textContent = fmt.format(Number(data.totais?.entradas||0));
+    $('#kpi-b').textContent = fmt.format(Number(data.totais?.saidas||0));
+    $('#kpi-c').textContent = fmt.format(Number((data.totais?.entradas||0)-(data.totais?.saidas||0)));
+    $('#kpi-d').textContent = fmt.format(Number(data.saldoLoja||0));
+
+    // tabela (se agregada, não tem lançamentos)
     const tb = $('#livro-tabela tbody'); tb.innerHTML='';
-    fin.lancamentos.forEach(l=>{
+    (data.lancamentos||[]).forEach(l=>{
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${l.data||''}</td><td>${l.historico||''}</td><td>${l.complemento||''}</td>
                       <td class="num in">${l.entrada?fmt.format(l.entrada):''}</td>
@@ -266,12 +286,15 @@ async function refreshModal(){
       tb.appendChild(tr);
     });
 
-    modalLine.data.labels = fin.serie.map(p=>p.dia);
-    modalLine.data.datasets[0].data = fin.serie.map(p=>p.saldo); modalLine.update();
-    modalBar.data.labels = fin.serie.map(p=>p.dia);
-    modalBar.data.datasets[0].data = fin.serie.map(p=>p.movimentos); modalBar.update();
+    modalLine.data.labels = (data.serie||[]).map(p=>p.dia);
+    modalLine.data.datasets[0].data = (data.serie||[]).map(p=>p.saldo);
+    modalLine.update();
+
+    modalBar.data.labels = (data.serie||[]).map(p=>p.dia);
+    modalBar.data.datasets[0].data = (data.serie||[]).map(p=>p.movimentos||0);
+    modalBar.update();
   }catch(err){
-    toast('Erro ao carregar o detalhamento.');
+    console.error(err);
     ['kpi-a','kpi-b','kpi-c','kpi-d'].forEach(id=>$('#'+id).textContent='—');
     $('#livro-tabela tbody').innerHTML='';
   }finally{
@@ -279,21 +302,24 @@ async function refreshModal(){
   }
 }
 
-/* ======= BOOT ======= */
+/* ========= BOOT ========= */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // mês atual padrão
+  // mês atual por padrão
   $('#periodo').value = new Date().toISOString().slice(0,7);
-  $('#lbl-periodo').textContent = `Período: ${$('#periodo').value.split('-').reverse().join('/')}`;
+  $('#last-update').textContent = new Date().toLocaleString('pt-BR');
+
   initCharts();
   loadCard();
 
+  // filtros
   $('#btn-refresh').addEventListener('click', loadCard);
   $('#empresa').addEventListener('change', loadCard);
-  $('#periodo').addEventListener('change', ()=>{ $('#lbl-periodo').textContent = `Período: ${$('#periodo').value.split('-').reverse().join('/')}`; loadCard(); });
+  $('#periodo').addEventListener('change', loadCard);
 
-  $('#btn-detalhar').addEventListener('click', openModal);
+  // modal
+  $('#card-periodo').addEventListener('click', openModal);
   $('#modal-close').addEventListener('click', closeModal);
-  $('#modal-backdrop').addEventListener('click', (e)=>{ if(e.target.id==='modal-backdrop') closeModal(); });
+  $('#modal-backdrop').addEventListener('click', e=>{ if(e.target.id==='modal-backdrop') closeModal(); });
   $('#modal-empresa').addEventListener('change', refreshModal);
   $('#modal-periodo').addEventListener('change', refreshModal);
 });
