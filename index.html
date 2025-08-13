@@ -12,17 +12,21 @@
     :root{ --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2; --primary:#00d1ff; --accent:#ff2e88; --ok:#37d399; --warn:#fec84b; --danger:#f43f5e; --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45); }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:
-      radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
-      radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
-      var(--bg); color:var(--ink); }
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background:
+        radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+        radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
+        var(--bg);
+      color:var(--ink);
+    }
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
     .title{font-size:28px;font-weight:700;letter-spacing:.3px}
     .subtitle{color:var(--muted);font-size:14px}
     .controls{display:flex;gap:12px;align-items:center}
     .btn, select, input[type="month"]{background:var(--panel);border:1px solid #1f1f1f;color:var(--ink);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow)}
-    .btn:hover{filter:brightness(1.08)}
+    .btn{cursor:pointer}.btn:hover{filter:brightness(1.08)}
     select{appearance:none}
 
     .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
@@ -32,10 +36,7 @@
     .mod .desc{color:var(--muted);font-size:12px}
     .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
     .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
-    .spark{width:100%;height:54px;margin-top:10px}
     .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
-    .chip{display:inline-flex;align-items:center;gap:6px;background:#0f0f0f;border:1px solid #1e1e1e;padding:6px 10px;border-radius:999px;font-size:12px}
-    .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
 
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
     .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer}
@@ -47,6 +48,26 @@
     .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
     .chart-card{padding:18px}
     canvas{width:100%;height:100%}
+
+    /* ===== Modal interno (caixa.html em iframe) ===== */
+    .backdrop{
+      position:fixed; inset:0; display:none; place-items:center;
+      background:rgba(0,0,0,.55); backdrop-filter:saturate(110%) blur(4px);
+      z-index:999;
+    }
+    .backdrop.show{ display:grid; }
+    .modal{
+      width:min(1200px, 92vw); height:min(86vh, 900px);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);
+      border:1px solid #1e1e1e; border-radius:22px; box-shadow: var(--shadow);
+      transform:scale(.92); opacity:0; transition:transform .16s ease-out, opacity .16s ease-out;
+      display:flex; flex-direction:column; overflow:hidden;
+    }
+    .backdrop.show .modal{ transform:scale(1); opacity:1; } /* efeito ZOOM */
+    .modal header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #1f1f1f;background:rgba(17,17,17,.9)}
+    .modal h2{margin:0;font-size:16px}
+    .close{appearance:none;border:1px solid #2a2a2a;background:#0f0f0f;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
+    .modal iframe{border:0; width:100%; height:100%}
   </style>
 </head>
 <body>
@@ -70,23 +91,22 @@
       </div>
     </header>
 
-    <!-- Módulos -->
+    <!-- Módulos (exemplo) -->
     <section class="modules">
-      <a class="mod" data-mod="METAS" id="link-metas" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="kpi-metas">—</div><canvas id="spark-metas" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
-      <a class="mod" data-mod="CANCELAMENTOS" id="link-cancel" href="#"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="kpi-cancel">—</div><canvas id="spark-cancel" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
-      <a class="mod" data-mod="TRAVAS" id="link-travas" href="#"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="kpi-travas">—</div><canvas id="spark-travas" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
-      <a class="mod" data-mod="FINANCEIRO" id="link-fin" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="kpi-fin">—</div><canvas id="spark-fin" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
-      <a class="mod" data-mod="DELIVERY" id="link-delivery" href="#"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi" id="kpi-delivery">—</div><canvas id="spark-delivery" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
-      <a class="mod" data-mod="CONCILIACAO" id="link-bank" href="#"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi" id="kpi-bank">—</div><canvas id="spark-bank" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
-      <a class="mod" data-mod="PESQUISA" id="link-nps" href="#"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi" id="kpi-nps">—</div><canvas id="spark-nps" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
-      <a class="mod" data-mod="MIDIAS" id="link-midias" href="#"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi" id="kpi-views">—</div><canvas id="spark-views" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
+      <div class="mod"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="kpi-fin">—</div><div class="foot"><span class="pill" style="background:#0f0f0f;border:1px solid #1e1e1e">Saldo</span></div></div>
+      <div class="mod"><span class="badge">Entradas</span><h4>Total de Entradas</h4><div class="desc">Somatório no mês</div><div class="kpi" id="kpi-ent">—</div></div>
+      <div class="mod"><span class="badge">Saídas</span><h4>Total de Saídas</h4><div class="desc">Somatório no mês</div><div class="kpi" id="kpi-said">—</div></div>
+      <div class="mod"><span class="badge">Loja</span><h4>Saldo na Loja (Cabeçalho)</h4><div class="desc">Valor exibido no topo da planilha</div><div class="kpi" id="kpi-saldo-loja">—</div></div>
     </section>
 
     <!-- KPIs gerais -->
     <section class="grid">
       <div class="card" id="card-periodo">
         <h3>Período</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill">Abrir Pop-up</span></div>
+        <div class="kpi-line">
+          <div class="kpi-value" id="kpi-competencia">—</div>
+          <span class="pill">Abrir Pop-up</span>
+        </div>
       </div>
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
       <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
@@ -101,147 +121,148 @@
     <div class="subtitle" style="margin-top:16px">Última atualização: <span id="last-update">—</span></div>
   </div>
 
+  <!-- ===== Modal interno com iframe para caixa.html ===== -->
+  <div id="backdrop" class="backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <header>
+        <h2 id="modal-title">Livro de Caixa — Detalhes</h2>
+        <button class="close" id="modal-close">✕</button>
+      </header>
+      <iframe id="caixa-frame" src="about:blank" title="Caixa"></iframe>
+    </div>
+  </div>
+
 <script>
-/* ====== CONFIG (DADO REAL) ====== */
+/* ====== CONFIG ====== */
 const CONFIG = {
-  POPUP_URL: 'popup.html',
+  IFRAME_PAGE: 'caixa.html', // você renomeou popup.html -> caixa.html
   API_URL: 'https://script.google.com/macros/s/AKfycbzqg8GEPFmod6W1xPxneXHAC6LRmnNAastew3QJtMpsf8mWwRowcZKZoNgRQskBM0-p/exec'
 };
 const $ = s => document.querySelector(s);
+const money = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n||0);
+const toNumber = v => (typeof v==='number') ? v : Number(String(v||'').replace(/[^0-9,-]/g,'').replace(/\./g,'').replace(',','.'))||0;
+const buildUrl = (base,params)=>{const u=new URL(base, window.location.href);Object.entries(params||{}).forEach(([k,v])=>{if(v!=null && v!=='') u.searchParams.set(k,v)});return u.toString();};
 
-/* ====== HELPERS ====== */
-const fmtBR = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
-function toNumber(v){
-  if(v==null) return 0;
-  if(typeof v === 'number') return v;
-  return Number(String(v).replace(/[^0-9,-]/g,'').replace(/\./g,'').replace(',', '.')) || 0;
-}
-function buildUrl(base, params){
-  const u = new URL(base);
-  Object.entries(params||{}).forEach(([k,v])=>{
-    if(v!=null && v!=='') u.searchParams.set(k,v);
-  });
-  return u.toString();
-}
-
-/* ====== CHARTS ====== */
+/* ====== GRÁFICOS ====== */
 let chartLine, chartBar;
-function makeLine(ctx){ return new Chart(ctx,{
-  type:'line',
-  data:{ labels:[], datasets:[
-    {label:'Entradas', data:[], tension:.35, borderWidth:2, pointRadius:0, borderColor:'#00d1ff'},
-    {label:'Saídas',   data:[], tension:.35, borderWidth:2, pointRadius:0, borderColor:'#ff2e88'}
-  ]},
-  options:{ plugins:{legend:{labels:{color:'#9aa3b8'}}},
-            scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}} }
-});}
-function makeBar(ctx){ return new Chart(ctx,{
-  type:'bar',
-  data:{ labels:[], datasets:[{label:'Movimentos', data:[], backgroundColor:'#00d1ff'}] },
-  options:{ plugins:{legend:{labels:{color:'#9aa3b8'}}},
-            scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}} }
-});}
+function makeLine(ctx){return new Chart(ctx,{type:'line',data:{labels:[],datasets:[
+  {label:'Entradas',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},
+  {label:'Saídas',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}
+]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}}});}
+function makeBar(ctx){return new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#00d1ff'}]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}}});}
 
-/* ====== POP-UP SYNC ====== */
-let popupWin = null;
-function currentFilters(){ return { company: $('#empresa').value, periodo: $('#periodo').value }; }
-function openPopup(e){
-  e && e.preventDefault && e.preventDefault();
-  const qs = new URLSearchParams(currentFilters()).toString();
-  const url = CONFIG.POPUP_URL + '?' + qs;
-  const w = window.open(url, 'popup_livro_caixa', 'width=1200,height=800,menubar=no,toolbar=no,location=no');
-  popupWin = w && !w.closed ? w : null;
-  if(!popupWin) window.location.href = url; // fallback se popup bloqueado
-}
-function syncFiltersToPopup(){
-  if(popupWin && !popupWin.closed){
-    popupWin.postMessage({ type:'livrocaixa-filters', payload: currentFilters() }, '*');
-  }
-}
-
-/* ====== DATA (API REAL) ====== */
-async function fetchMovements(empresa, periodo){
-  const url = buildUrl(CONFIG.API_URL, { action:'list', empresa, periodo });
-  const r = await fetch(url, { cache:'no-store' });
+/* ====== API ====== */
+async function fetchMovements(empresa,periodo){
+  const r = await fetch(buildUrl(CONFIG.API_URL,{action:'list',empresa,periodo}), {cache:'no-store'});
   if(!r.ok) throw new Error('Falha ao carregar movimentos');
-  const data = await r.json();
-  return Array.isArray(data) ? data : (data.items || data.rows || []);
+  const j = await r.json();
+  return Array.isArray(j) ? j : (j.items || j.rows || j.data || []);
 }
 function summarize(rows){
-  let entradas = 0, saidas = 0;
-  const byDay = new Map();
+  let entradas=0, saidas=0; const byDay=new Map();
   for(const it of rows){
-    const d = (it.data || it.Data || '').slice(0,10);
-    const key = d.includes('/') ? d.split('/').reverse().join('-') : d;
-    const e = toNumber(it.entrada ?? it.Entrada);
-    const s = toNumber(it.saida   ?? it.Saida);
-    entradas += e; saidas += s;
+    const d=(it.data||it.Data||'').slice(0,10);
+    const key=d.includes('/')?d.split('/').reverse().join('-'):d;
+    const e=toNumber(it.entrada??it.Entrada), s=toNumber(it.saida??it.Saida);
+    entradas+=e; saidas+=s;
     if(!byDay.has(key)) byDay.set(key,{e:0,s:0});
-    byDay.get(key).e += e; byDay.get(key).s += s;
+    byDay.get(key).e+=e; byDay.get(key).s+=s;
   }
-  const labels = [...byDay.keys()].sort();
-  const serieE = labels.map(k=> byDay.get(k).e);
-  const serieS = labels.map(k=> byDay.get(k).s);
-  return { entradas, saidas, labels, serieE, serieS, saldo: entradas - saidas };
+  const labels=[...byDay.keys()].sort();
+  return {entradas,saidas,labels,serieE:labels.map(k=>byDay.get(k).e),serieS:labels.map(k=>byDay.get(k).s),saldo:entradas-saidas};
 }
 
-/* ====== LOAD (DADOS REAIS) ====== */
+/* ====== POP-UP INTERNO (IFRAME) ====== */
+const backdrop = $('#backdrop');
+const iframe   = $('#caixa-frame');
+
+function currentFilters(){
+  return { company: $('#empresa').value, periodo: $('#periodo').value };
+}
+function openModal(){
+  // monta URL do caixa.html com os filtros atuais
+  iframe.src = buildUrl(CONFIG.IFRAME_PAGE, currentFilters());
+  backdrop.classList.add('show');
+  backdrop.setAttribute('aria-hidden','false');
+}
+function closeModal(){
+  backdrop.classList.remove('show');
+  backdrop.setAttribute('aria-hidden','true');
+  // opcional: limpar src para forçar recarga na próxima abertura
+  // iframe.src = 'about:blank';
+}
+// fecha ao clicar fora
+backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop) closeModal(); });
+$('#modal-close').addEventListener('click', closeModal);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
+// se filtros mudarem e o modal estiver aberto, recarrega o iframe
+function syncIframeIfOpen(){
+  if(backdrop.classList.contains('show')){
+    iframe.src = buildUrl(CONFIG.IFRAME_PAGE, currentFilters());
+  }
+}
+
+/* ====== DASHBOARD (carrega KPIs/Gráficos) ====== */
 async function loadIndex(){
-  const empresa = $('#empresa').value;
-  const periodo = $('#periodo').value;
+  const emp=$('#empresa').value, per=$('#periodo').value;
+  $('#kpi-competencia').textContent = per.split('-').reverse().join('/');
+
   try{
-    const rows = await fetchMovements(empresa, periodo);
+    const rows = await fetchMovements(emp, per);
     const s = summarize(rows);
 
-    // Período (mostra mês) e saldo no módulo Financeiro
-    $('#kpi-competencia').textContent = periodo.split('-').reverse().join('/');
-    const elFin = document.getElementById('kpi-fin');
-    if(elFin) elFin.textContent = fmtBR.format(s.saldo);
+    $('#kpi-fin').textContent  = money(s.saldo);
+    $('#kpi-ent').textContent  = money(s.entradas);
+    $('#kpi-said').textContent = money(s.saidas);
 
-    // Gráficos reais
-    if(!chartLine) chartLine = makeLine(document.getElementById('line-timeline'));
-    if(!chartBar)  chartBar  = makeBar(document.getElementById('bar-days'));
+    if(!chartLine) chartLine = makeLine($('#line-timeline'));
+    if(!chartBar)  chartBar  = makeBar($('#bar-days'));
 
-    chartLine.data.labels = s.labels.map(l=> l.split('-').reverse().join('/'));
+    const labelsBR = s.labels.map(x=>x.split('-').reverse().join('/'));
+    chartLine.data.labels = labelsBR;
     chartLine.data.datasets[0].data = s.serieE;
     chartLine.data.datasets[1].data = s.serieS;
     chartLine.update();
 
-    chartBar.data.labels = chartLine.data.labels;
+    chartBar.data.labels = labelsBR;
     chartBar.data.datasets[0].data = s.serieE.map((v,i)=> v + (s.serieS[i]||0));
     chartBar.update();
 
     $('#last-update').textContent = new Date().toLocaleString('pt-BR');
-  }catch(err){
-    console.error(err);
-    const elFin = document.getElementById('kpi-fin');
-    if(elFin) elFin.textContent = '—';
+  }catch(e){
+    console.error(e);
+    $('#kpi-fin').textContent = '—';
   }
 }
 
 /* ====== INIT ====== */
 function init(){
+  // mês atual
   const month = new Date().toISOString().slice(0,7);
   $('#periodo').value = month;
   $('#kpi-competencia').textContent = month.split('-').reverse().join('/');
 
-  chartLine = makeLine(document.getElementById('line-timeline'));
-  chartBar  = makeBar(document.getElementById('bar-days'));
+  // gráficos
+  chartLine = makeLine($('#line-timeline'));
+  chartBar  = makeBar($('#bar-days'));
 
-  document.getElementById('card-periodo').addEventListener('click', openPopup);
-  document.getElementById('btn-refresh').addEventListener('click', ()=>{ loadIndex(); syncFiltersToPopup(); });
+  // abrir modal no card
+  $('#card-periodo').addEventListener('click', openModal);
 
-  document.getElementById('empresa').addEventListener('change', ()=>{ loadIndex(); syncFiltersToPopup(); });
-  document.getElementById('periodo').addEventListener('change', ()=>{ 
+  // filtros
+  $('#btn-refresh').addEventListener('click', ()=>{ loadIndex(); syncIframeIfOpen(); });
+  $('#empresa').addEventListener('change', ()=>{ loadIndex(); syncIframeIfOpen(); });
+  $('#periodo').addEventListener('change', ()=>{ 
     $('#kpi-competencia').textContent = $('#periodo').value.split('-').reverse().join('/'); 
     loadIndex(); 
-    syncFiltersToPopup(); 
+    syncIframeIfOpen();
   });
 
-  loadIndex(); // primeira carga REAL
+  loadIndex();
 }
 
-window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); }catch(e){ console.error('Init error', e); } });
+window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); } catch(err){ console.error(err); } });
 </script>
 </body>
 </html>
