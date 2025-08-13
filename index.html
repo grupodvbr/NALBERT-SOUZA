@@ -12,10 +12,13 @@
     :root{ --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2; --primary:#00d1ff; --accent:#ff2e88; --ok:#37d399; --warn:#fec84b; --danger:#f43f5e; --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45); }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:
-      radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
-      radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
-      var(--bg); color:var(--ink); }
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink);
+      background:
+        radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+        radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
+        var(--bg);
+    }
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
     .title{font-size:28px;font-weight:700;letter-spacing:.3px}
@@ -26,17 +29,16 @@
     select{appearance:none}
 
     .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
-    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .2s ease, filter .2s ease}
+    .mod{
+      position:relative;display:block;text-decoration:none;color:inherit;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);
+      border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);
+      overflow:hidden;cursor:pointer;transition:transform .2s ease, filter .2s ease
+    }
     .mod:hover{transform:translateY(-2px);filter:brightness(1.02)}
     .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
     .mod .desc{color:var(--muted);font-size:12px}
-    .mod .kpi{font-size:26px;font-weight:800;margin-top:10px;line-height:1.35}
-    /* 🔽 Fonte menor e layout compacto só para o card de Metas */
-    #kpi-metas{font-size:13px; line-height:1.35; font-weight:600}
-    #kpi-metas .emp{display:flex;justify-content:space-between;gap:10px; margin-top:6px}
-    #kpi-metas .emp-name{color:#cfd6e6; font-weight:700}
-    #kpi-metas .emp-val{color:#e9efff; white-space:nowrap}
-
+    .mod .kpi{font-size:24px;font-weight:800;margin-top:10px;line-height:1.35}
     .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
     .spark{width:100%;height:54px;margin-top:10px}
     .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
@@ -44,7 +46,11 @@
     .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
 
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);
+      border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);
+      position:relative;overflow:hidden;cursor:pointer
+    }
     .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
     .kpi-line{display:flex;align-items:center;justify-content:space-between}
     .kpi-value{font-size:28px;font-weight:700}
@@ -53,6 +59,24 @@
     .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
     .chart-card{padding:18px}
     canvas{width:100%;height:100%}
+
+    /* ===== Card Metas — UI bonita e compacta ===== */
+    #kpi-metas{font-size:13px;line-height:1.35;font-weight:600}
+    #kpi-metas .meta-head{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .meta-list{
+      margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;
+      max-height:190px; overflow:auto; scrollbar-width:thin;
+    }
+    .meta-item{
+      background:#0f0f0f;border:1px solid #1f1f1f;border-radius:12px;padding:8px 10px;
+    }
+    .meta-top{display:flex;justify-content:space-between;gap:10px;font-weight:700;margin-bottom:6px}
+    .meta-name{color:#e8ecf9;letter-spacing:.2px;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .meta-val{color:#e9efff;white-space:nowrap}
+    .meta-sub{display:flex;align-items:center;gap:10px;justify-content:space-between;font-size:12px;color:var(--muted)}
+    .progress{flex:1;height:7px;background:#151515;border-radius:999px;overflow:hidden;box-shadow:inset 0 0 0 1px #1d1d1d}
+    .progress>i{display:block;height:100%;width:var(--w,0%);background:linear-gradient(90deg,var(--primary),#46e0ff);border-radius:999px}
+    .badge-mini{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid #1f1f1f;background:#0c0c0c;color:#cfd6e6;margin-left:6px}
   </style>
 </head>
 <body>
@@ -78,14 +102,77 @@
 
     <!-- Módulos -->
     <section class="modules">
-      <a class="mod" data-mod="METAS" id="link-metas" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="kpi-metas">—</div><canvas id="spark-metas" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
-      <a class="mod" data-mod="CANCELAMENTOS" id="link-cancel" href="#"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="kpi-cancel">—</div><canvas id="spark-cancel" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
-      <a class="mod" data-mod="TRAVAS" id="link-travas" href="#"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="kpi-travas">—</div><canvas id="spark-travas" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
-      <a class="mod" data-mod="FINANCEIRO" id="link-fin" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="kpi-fin">—</div><canvas id="spark-fin" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
-      <a class="mod" data-mod="DELIVERY" id="link-delivery" href="#"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Bruto / plataformas</div><div class="kpi" id="kpi-delivery">—</div><canvas id="spark-delivery" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
-      <a class="mod" data-mod="CONCILIACAO" id="link-bank" href="#"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi" id="kpi-bank">—</div><canvas id="spark-bank" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
-      <a class="mod" data-mod="PESQUISA" id="link-nps" href="#"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi" id="kpi-nps">—</div><canvas id="spark-nps" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
-      <a class="mod" data-mod="ABC" id="link-abc" href="#"><span class="badge">ABC</span><h4>ABC de Vendas</h4><div class="desc">Faturamento / lucro</div><div class="kpi" id="kpi-abc">—</div><canvas id="spark-abc" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Destaque</span></div></a>
+      <a class="mod" data-mod="METAS" id="link-metas" href="#">
+        <span class="badge">Metas</span>
+        <h4>Metas</h4>
+        <div class="desc">Faturamento vs. objetivo</div>
+        <div class="kpi" id="kpi-metas">—</div>
+        <canvas id="spark-metas" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i></i> Progresso</span></div>
+      </a>
+
+      <a class="mod" data-mod="CANCELAMENTOS" id="link-cancel" href="#">
+        <span class="badge">Cancelamentos</span>
+        <h4>Cancelamentos</h4>
+        <div class="desc">Itens/valor cancelado</div>
+        <div class="kpi" id="kpi-cancel">—</div>
+        <canvas id="spark-cancel" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div>
+      </a>
+
+      <a class="mod" data-mod="TRAVAS" id="link-travas" href="#">
+        <span class="badge">Travas</span>
+        <h4>Travas de Compras</h4>
+        <div class="desc">Planos válidos e já comprado</div>
+        <div class="kpi" id="kpi-travas">—</div>
+        <canvas id="spark-travas" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div>
+      </a>
+
+      <a class="mod" data-mod="FINANCEIRO" id="link-fin" href="#">
+        <span class="badge">Financeiro</span>
+        <h4>Resumo Financeiro</h4>
+        <div class="desc">Entradas x Saídas</div>
+        <div class="kpi" id="kpi-fin">—</div>
+        <canvas id="spark-fin" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div>
+      </a>
+
+      <a class="mod" data-mod="DELIVERY" id="link-delivery" href="#">
+        <span class="badge">Delivery</span>
+        <h4>Vendas em Delivery</h4>
+        <div class="desc">Bruto / plataformas</div>
+        <div class="kpi" id="kpi-delivery">—</div>
+        <canvas id="spark-delivery" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i></i> Crescimento</span></div>
+      </a>
+
+      <a class="mod" data-mod="CONCILIACAO" id="link-bank" href="#">
+        <span class="badge">Bancária</span>
+        <h4>Conciliação Bancária</h4>
+        <div class="desc">Conferência de movimentos</div>
+        <div class="kpi" id="kpi-bank">—</div>
+        <canvas id="spark-bank" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div>
+      </a>
+
+      <a class="mod" data-mod="PESQUISA" id="link-nps" href="#">
+        <span class="badge">NPS</span>
+        <h4>Pesquisa de Satisfação</h4>
+        <div class="desc">NPS / avaliações</div>
+        <div class="kpi" id="kpi-nps">—</div>
+        <canvas id="spark-nps" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div>
+      </a>
+
+      <a class="mod" data-mod="ABC" id="link-abc" href="#">
+        <span class="badge">ABC</span>
+        <h4>ABC de Vendas</h4>
+        <div class="desc">Faturamento / lucro</div>
+        <div class="kpi" id="kpi-abc">—</div>
+        <canvas id="spark-abc" class="spark"></canvas>
+        <div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Destaque</span></div>
+      </a>
     </section>
 
     <!-- KPIs gerais -->
@@ -206,7 +293,7 @@ function summarize(rows){
   return { entradas, saidas, labels, serieE, serieS, saldo: entradas - saidas };
 }
 
-/* ====== METAS (LISTA POR EMPRESA, SEM SOMAR) ====== */
+/* ====== METAS — lista por empresa com barra de progresso ====== */
 async function loadMetas(){
   const empresaSel = $('#empresa').value;
   const periodo = $('#periodo').value; // YYYY-MM
@@ -214,43 +301,44 @@ async function loadMetas(){
     const r = await fetch(CONFIG.METAS_URL, { cache:'no-store' });
     const data = await r.json();
 
-    // Filtra mês e, se aplicável, empresa
-    const mesDados = data.filter(it => {
+    const rows = data.filter(it=>{
       const dt = (it.Data || it.data || '').slice(0,10);
       const emp = it.Empresa || it.empresa;
-      const okMes = dt.startsWith(periodo);
-      const okEmp = (empresaSel==='TODAS') || (emp===empresaSel);
-      return okMes && okEmp;
+      return dt.startsWith(periodo) && (empresaSel==='TODAS' || emp===empresaSel);
     });
+    if(!rows.length){ $('#kpi-metas').textContent='—'; return; }
 
-    if(mesDados.length===0){ $('#kpi-metas').textContent = '—'; return; }
-
-    // Agrupa por empresa e pega o registro mais recente do mês
-    const latestByEmp = {};
-    mesDados.forEach(it=>{
-      const emp = it.Empresa || it.empresa;
+    const latest = {};
+    rows.forEach(it=>{
+      const emp = (it.Empresa || it.empresa || '').trim();
       const dt  = (it.Data || it.data || '').slice(0,10);
-      if(!latestByEmp[emp] || dt > latestByEmp[emp].dt){
-        latestByEmp[emp] = { dt, previsto: toNumber(it.Previsto), realizado: toNumber(it.Realizado) };
+      if(!latest[emp] || dt > latest[emp].dt){
+        latest[emp] = { dt, previsto: toNumber(it.Previsto), realizado: toNumber(it.Realizado) };
       }
     });
 
-    // Monta a lista
-    const linhas = Object.entries(latestByEmp)
-      .sort(([a],[b]) => a.localeCompare(b))
-      .map(([emp, obj])=>{
-        const perc = obj.previsto>0 ? (obj.realizado/obj.previsto)*100 : 0;
-        return `<div class="emp">
-                  <span class="emp-name">${emp}</span>
-                  <span class="emp-val">Meta ${fmtBR.format(obj.previsto)} • ${perc.toFixed(1)}% (${fmtBR.format(obj.realizado)})</span>
-                </div>`;
-      }).join('');
+    const items = Object.entries(latest).sort(([a],[b])=>a.localeCompare(b)).map(([emp, v])=>{
+      const perc = v.previsto>0 ? (v.realizado/v.previsto)*100 : 0;
+      const status =
+        perc>=100 ? '<span class="badge-mini" style="color:#7fffb4;border-color:#1f3b2f">OK</span>' :
+        perc>=70  ? '<span class="badge-mini" style="color:#ffe08a;border-color:#3b341f">Andamento</span>' :
+                    '<span class="badge-mini" style="color:#ff9aaa;border-color:#3b1f26">Atenção</span>';
+      return `
+        <li class="meta-item">
+          <div class="meta-top">
+            <div class="meta-name">${emp}</div>
+            <div class="meta-val">${fmtBR.format(v.previsto)}</div>
+          </div>
+          <div class="meta-sub">
+            <div class="progress" style="--w:${perc.toFixed(1)}%"><i></i></div>
+            <div>${perc.toFixed(1)}% <span style="color:#cfe9ff">(${fmtBR.format(v.realizado)})</span> ${status}</div>
+          </div>
+        </li>`;
+    }).join('');
 
-    // Cabeçalho pequeno (mostra mês)
     const [y,m] = periodo.split('-');
-    const head = `<div style="font-size:12px;color:var(--muted);margin-bottom:2px">${m}/${y} • ${empresaSel==='TODAS'?'Grupo':empresaSel}</div>`;
-
-    $('#kpi-metas').innerHTML = head + linhas;
+    const head = `<div class="meta-head">${m}/${y} • ${empresaSel==='TODAS' ? 'Grupo' : empresaSel}</div>`;
+    $('#kpi-metas').innerHTML = head + `<ul class="meta-list">${items}</ul>`;
   }catch(e){
     console.error('Metas erro', e);
     $('#kpi-metas').textContent='—';
@@ -335,7 +423,6 @@ async function loadIndex(){
   const empresa = $('#empresa').value;
   const periodo = $('#periodo').value;
   try{
-    // Financeiro base
     const rows = await fetchMovements(empresa, periodo);
     const s = summarize(rows);
 
@@ -355,13 +442,7 @@ async function loadIndex(){
     chartBar.data.datasets[0].data = s.serieE.map((v,i)=> v + (s.serieS[i]||0));
     chartBar.update();
 
-    await Promise.all([
-      loadMetas(),
-      loadCancel(),
-      loadDelivery(),
-      loadNPS(),
-      loadABC()
-    ]);
+    await Promise.all([ loadMetas(), loadCancel(), loadDelivery(), loadNPS(), loadABC() ]);
 
     $('#last-update').textContent = new Date().toLocaleString('pt-BR');
   }catch(err){
@@ -390,9 +471,8 @@ function init(){
     syncFiltersToPopup(); 
   });
 
-  loadIndex(); // primeira carga REAL
+  loadIndex();
 }
-
 window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); }catch(e){ console.error('Init error', e); } });
 </script>
 </body>
