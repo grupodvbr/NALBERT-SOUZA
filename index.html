@@ -21,29 +21,56 @@
     .subtitle{color:var(--muted);font-size:14px}
     .controls{display:flex;gap:12px;align-items:center}
     .btn,select{background:var(--panel);border:1px solid #1f1f1f;color:var(--ink);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow)}
-    .btn[disabled]{opacity:.7;cursor:not-allowed}
+    .btn:hover{filter:brightness(1.08)} select{appearance:none}
     .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
-    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow)}
-    .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}.desc{color:var(--muted);font-size:12px}.kpi{font-size:26px;font-weight:800;margin-top:10px}
+    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .2s ease, filter .2s ease}
+    .mod:hover{transform:translateY(-2px);filter:brightness(1.02)}
+    .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
+    .mod .desc{color:var(--muted);font-size:12px}
+    .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
+    .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
+    .spark{width:100%;height:54px;margin-top:10px}
+    .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip{display:inline-flex;align-items:center;gap:6px;background:#0f0f0f;border:1px solid #1e1e1e;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .card-click{cursor:pointer;transition:transform .15s ease}
+    .card-click:hover{transform:translateY(-2px)}
+    .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
     .kpi-line{display:flex;align-items:center;justify-content:space-between}
     .kpi-value{font-size:28px;font-weight:700;min-height:34px}
     .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
-    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}.chart-card{padding:18px}
-    .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35)} .overlay.show{display:grid}
-    .spinner{width:16px;height:16px;border:2px solid #2a2a2a;border-top-color:var(--primary);border-radius:50%;display:inline-block;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-    /* modal */
-    .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:999}
-    .modal-backdrop.show{display:grid}
-    .modal{width:min(1100px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow)}
-    .modal header{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(17,17,17,.9);border-bottom:1px solid #1f1f1f}
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
+    .chart-card{padding:18px} canvas{width:100%;height:100%}
+    .spinner{width:16px;height:16px;border:2px solid #2a2a2a;border-top-color:var(--primary);border-radius:50%;display:inline-block;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(1px)}
+    .overlay.show{display:grid}
+    .toast{position:fixed;right:18px;bottom:18px;background:#111;border:1px solid #2a2a2a;color:var(--ink);padding:10px 12px;border-radius:12px;box-shadow:var(--shadow);display:none;max-width:min(90vw,460px);z-index:9999}
+    .toast.show{display:block;animation:fadeIn .15s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(4px);z-index:999}
+    .modal-backdrop.show{display:grid !important;animation:fadeIn .18s ease-out}
+    .modal{width:min(1100px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow);position:relative}
+    .modal header{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:rgba(17,17,17,.9);border-bottom:1px solid #1f1f1f}
+    .modal h2{margin:0;font-size:18px;letter-spacing:.2px}
+    .modal .close{appearance:none;border:1px solid #2a2a2a;background:#0f0f0f;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
     .modal .content{padding:18px;position:relative}
     .modal .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-    .modal .kpis{display:grid;gap:14px;grid-template-columns:repeat(4,1fr)}
+    .modal .filters select,.modal .filters input{background:var(--soft);border:1px solid #232323;color:var(--ink);padding:10px 12px;border-radius:12px}
+    .modal .kpis{display:grid;gap:14px;grid-template-columns:repeat(4,1fr);margin-top:12px}
+    .modal .kpis .k{background:#0f0f0f;border:1px solid #1f1f1f;border-radius:14px;padding:12px 14px}
+    .modal .k .label{color:#aab2c7;font-size:12px}
+    .modal .k .val{font-size:22px;font-weight:800;margin-top:4px;min-height:28px}
+    .modal .charts{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:12px}
+    .modal .chart-card{background:#0f0f0f;border:1px solid #1f1f1f;border-radius:14px;padding:14px 14px 10px}
+    .modal footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid #1f1f1f;background:rgba(17,17,17,.9);position:sticky;bottom:0}
+    .modal .btn-primary{background:var(--primary);color:#0a0a0a;border:0;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
     table{width:100%;border-collapse:collapse;margin-top:12px}
     th,td{padding:8px 10px;border-bottom:1px solid #1f1f1f;font-size:13px}
-    td.num{text-align:right}.in{color:var(--ok)}.out{color:var(--danger)}
+    th{color:#aab2c7;text-align:left} td.num{text-align:right}
+    .out{color:var(--danger)} .in{color:var(--ok)}
     @media (max-width:1280px){.modules{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}}
     @media (max-width:1100px){.modal .kpis{grid-template-columns:repeat(2,1fr)}.modal .charts{grid-template-columns:1fr}}
   </style>
@@ -59,7 +86,7 @@
         <select id="empresa">
           <option value="TODAS">Todas as empresas</option>
           <option>MERCATTO DELICIA</option>
-          <option>DELICIA GOURMET</option>
+          <option selected>DELICIA GOURMET</option>
           <option>PADARIA DELICIA</option>
           <option>VILLA GOURMET</option>
           <option>M. KIDS</option>
@@ -69,24 +96,35 @@
       </div>
     </header>
 
-    <!-- seus cards seguem (mantidos) -->
+    <!-- Módulos (mesmo layout; KPIs de exemplo) -->
+    <section class="modules">
+      <a class="mod" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi">—</div><canvas class="spark" id="sp1"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
+      <a class="mod" href="#"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi">—</div><canvas class="spark" id="sp2"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
+      <a class="mod" href="#"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi">—</div><canvas class="spark" id="sp3"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
+      <a class="mod" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi">—</div><canvas class="spark" id="sp4"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
+      <a class="mod" href="#"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi">—</div><canvas class="spark" id="sp5"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
+      <a class="mod" href="#"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi">—</div><canvas class="spark" id="sp6"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
+      <a class="mod" href="#"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi">—</div><canvas class="spark" id="sp7"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
+      <a class="mod" href="#"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi">—</div><canvas class="spark" id="sp8"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
+    </section>
 
-    <section class="grid">
-      <!-- ESTE CARD AGORA MOSTRA O SALDO DO MÊS E ABRE O POP-UP -->
-      <div class="card" id="card-periodo" style="cursor:pointer">
+    <!-- Card SALDO NA LOJA (mês) -->
+    <section class="grid" style="margin-top:22px">
+      <div class="card card-click" id="card-saldo">
         <div class="overlay" id="card-loader"><div><span class="spinner"></span> Carregando…</div></div>
         <h3>Saldo na Loja (mês)</h3>
         <div class="kpi-line">
-          <div class="kpi-value" id="kpi-competencia">—</div>
+          <div class="kpi-value" id="kpi-saldo">—</div>
           <span class="pill">Detalhar</span>
         </div>
-        <div class="subtitle" id="lbl-periodo" style="margin-top:6px;color:#a9b0c2">—</div>
+        <div class="subtitle" id="lbl-periodo" style="margin-top:6px;color:var(--muted);font-size:12px">—</div>
       </div>
 
-      <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value">—</div><span class="pill" style="background:#ff2e88">Ativos</span></div></div>
-      <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value">—</div><span class="pill" style="background:#37d399">Créditos</span></div></div>
+      <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
+      <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
     </section>
 
+    <!-- Charts decorativos -->
     <section class="charts">
       <div class="card chart-card"><h3>Timeline geral</h3><canvas id="line-timeline" height="300"></canvas></div>
       <div class="card chart-card"><h3>Dias mais ativos</h3><canvas id="bar-days" height="300"></canvas></div>
@@ -97,10 +135,10 @@
 
   <!-- Modal -->
   <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <header>
-        <h2>Livro de Caixa (Entradas x Saídas)</h2>
-        <button class="btn" id="modal-close">Fechar</button>
+        <h2 id="modal-title">Livro de Caixa (Entradas x Saídas)</h2>
+        <button class="close" id="modal-close" aria-label="Fechar (Esc)">✕</button>
       </header>
       <div class="content">
         <div class="overlay" id="modal-loader"><div><span class="spinner"></span> Carregando…</div></div>
@@ -109,7 +147,7 @@
           <select id="modal-empresa">
             <option value="TODAS">Todas as empresas</option>
             <option>MERCATTO DELICIA</option>
-            <option>DELICIA GOURMET</option>
+            <option selected>DELICIA GOURMET</option>
             <option>PADARIA DELICIA</option>
             <option>VILLA GOURMET</option>
             <option>M. KIDS</option>
@@ -117,11 +155,11 @@
           <input type="month" id="modal-periodo" />
         </div>
 
-        <div class="kpis">
-          <div><div style="color:#a9b0c2;font-size:12px">Entradas (mês)</div><div class="kpi-value" id="kpi-a">—</div></div>
-          <div><div style="color:#a9b0c2;font-size:12px">Saídas (mês)</div><div class="kpi-value" id="kpi-b">—</div></div>
-          <div><div style="color:#a9b0c2;font-size:12px">Saldo do mês</div><div class="kpi-value" id="kpi-c">—</div></div>
-          <div><div style="color:#a9b0c2;font-size:12px">Saldo na Loja</div><div class="kpi-value" id="kpi-d">—</div></div>
+        <div class="kpis" id="modal-kpis">
+          <div class="k"><div class="label">Entradas (mês)</div><div class="val" id="kpi-a">—</div></div>
+          <div class="k"><div class="label">Saídas (mês)</div><div class="val" id="kpi-b">—</div></div>
+          <div class="k"><div class="label">Saldo do mês</div><div class="val" id="kpi-c">—</div></div>
+          <div class="k"><div class="label">Saldo na Loja (E4)</div><div class="val" id="kpi-d">—</div></div>
         </div>
 
         <table id="livro-tabela">
@@ -130,196 +168,146 @@
         </table>
 
         <div class="charts">
-          <div class="chart-card"><canvas id="modal-line" height="240"></canvas></div>
-          <div class="chart-card"><canvas id="modal-bar" height="240"></canvas></div>
+          <div class="chart-card"><h3 style="margin:0 0 6px;color:var(--muted);font-size:13px">Saldo diário</h3><canvas id="modal-line" height="240"></canvas></div>
+          <div class="chart-card"><h3 style="margin:0 0 6px;color:var(--muted);font-size:13px">Movimentos por dia</h3><canvas id="modal-bar" height="240"></canvas></div>
         </div>
       </div>
+      <footer><a id="modal-link-full" class="btn-primary" href="#" target="_blank" rel="noopener">Abrir página completa</a></footer>
     </div>
   </div>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
-/* ========= CONFIG =========
- * 1) API_BASE: sua URL /exec do Apps Script
- * 2) SHEETS: informe o ID da PLANILHA de cada empresa
- */
+/* ========= CONFIG ========= */
+// COLE A URL /exec do Apps Script:
 const CONFIG = {
-  API_BASE: 'https://script.google.com/macros/s/AKfycbwu6M9sevqvEtfKFgDqp0NxB-U3ini-2MKYSfrOndNzj_7btlaT3ziwVg5r701tHaMqCA/exec',
-  SHEETS: {
-    'MERCATTO DELICIA': 'COLE_ID_PLANILHA_MERCATTO',
-    'DELICIA GOURMET' : 'COLE_ID_PLANILHA_DELICIA_GOURMET',
-    'PADARIA DELICIA' : 'COLE_ID_PLANILHA_PADARIA',
-    'VILLA GOURMET'   : 'COLE_ID_PLANILHA_VILLA',
-    'M. KIDS'         : 'COLE_ID_PLANILHA_MKIDS'
+  APIS: {
+    FINANCEIRO: 'https://script.google.com/macros/s/AKfycbzep8JTgidRjuD_0vMcYsz1tBFCytJjOGu4uBvqaA7PYGSfYr5YdIMujPtuPTR3Joh2pA/exec'
   }
 };
+const $ = s => document.querySelector(s);
+const fmtBRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 
-const $  = s => document.querySelector(s);
-const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
-
-/* ========= HELPERS ========= */
-function busy(el, on){ el.classList.toggle('show', !!on); }
-function buildUrl(sheetId, periodo){
-  const u = new URL(CONFIG.API_BASE);
-  u.searchParams.set('sheetId', sheetId);
-  u.searchParams.set('periodo', periodo);
-  return u.toString();
+/* ========= helpers UI ========= */
+function spark(el,data){
+  const ctx=document.getElementById(el);
+  const g=ctx.getContext('2d').createLinearGradient(0,0,0,60);
+  g.addColorStop(0,'rgba(0,209,255,.35)'); g.addColorStop(1,'rgba(255,46,136,.05)');
+  return new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data,borderWidth:2,pointRadius:0,tension:.35,fill:true,backgroundColor:g,borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
 }
-async function fetchJSON(url){
-  const r = await fetch(url, { headers:{'cache-control':'no-cache'} });
-  const text = await r.text();
-  return JSON.parse(text); // se não for JSON, vai acusar erro no console
-}
+function showToast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4000);}
+function showCardLoader(on){ $('#card-loader').classList.toggle('show',!!on); }
+function showModalLoader(on){ $('#modal-loader').classList.toggle('show',!!on); }
+function buildUrl(base,empresa,periodo){const u=new URL(base); if(empresa&&empresa!=='TODAS')u.searchParams.set('empresa',empresa); if(periodo)u.searchParams.set('periodo',periodo); return u.toString();}
+async function fetchJSON(url){const r=await fetch(url,{headers:{'cache-control':'no-cache'}}); const txt=await r.text(); try{return JSON.parse(txt);} catch(e){throw new Error('API não retornou JSON')}};
 
-/* ========= FINANCEIRO ========= */
-async function getEmpresaData(empresa, periodo){
-  const id = CONFIG.SHEETS[empresa];
-  if(!id) throw new Error(`Sem ID de planilha para "${empresa}" em CONFIG.SHEETS`);
-  const data = await fetchJSON(buildUrl(id, periodo));
-  if(data.ok === false) throw new Error(data.error || 'Erro na API');
-  return data;
-}
-// “TODAS”: soma de todas as empresas
-async function getAllEmpresas(periodo){
-  const keys = Object.keys(CONFIG.SHEETS);
-  const res = await Promise.all(keys.map(k => getEmpresaData(k, periodo).catch(()=>null)));
-  const vivos = res.filter(Boolean);
-  const total = { entradas:0, saidas:0, saldoLoja:0 };
-  vivos.forEach(d => { total.entradas += d.totais.entradas; total.saidas += d.totais.saidas; total.saldoLoja += d.saldoLoja; });
-
-  // série agregada por dia (usa maior lista de dias; onde faltar, trata como 0)
-  const diasSet = new Set();
-  vivos.forEach(d => d.serie.forEach(p=>diasSet.add(p.dia)));
-  const dias = Array.from(diasSet).sort();
-
-  const serie = dias.map(dia=>{
-    let sal=0, mov=0;
-    vivos.forEach(s => {
-      const p = s.serie.find(x=>x.dia===dia);
-      if(p){ sal += p.saldo; mov += p.movimentos; }
-    });
-    return { dia, saldo: sal, movimentos: mov };
-  });
-
-  return {
-    ok:true,
-    totais:{ entradas: total.entradas, saidas: total.saidas },
-    saldoLoja: total.saldoLoja,
-    lancamentos: [], // agregada não exibe linha-a-linha
-    serie
-  };
+/* ========= Charts decorativos ========= */
+let lineMain, barMain, modalLine, modalBar;
+function bootCharts(){
+  lineMain = new Chart($('#line-timeline'),{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]}}); 
+  barMain  = new Chart($('#bar-days'),{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]}}); 
 }
 
-/* ========= UI: CARD ========= */
-let chartLine, chartBar, modalLine, modalBar;
-
-function initCharts(){
-  chartLine = new Chart($('#line-timeline'), {type:'line', data:{labels:[],datasets:[{label:'Saldo diário',data:[],tension:.35,pointRadius:0,borderWidth:2,borderColor:'#00d1ff'}]}});
-  chartBar  = new Chart($('#bar-days'),     {type:'bar',  data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
-
-  modalLine = new Chart($('#modal-line'), {type:'line', data:{labels:[],datasets:[{label:'Saldo diário',data:[],tension:.35,pointRadius:0,borderWidth:2,borderColor:'#00d1ff'}]}});
-  modalBar  = new Chart($('#modal-bar'),  {type:'bar',  data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
-}
-
-async function loadCard(){
+/* ========= FINANCEIRO (lê E4) ========= */
+async function loadSaldoCard(){
   const empresa = $('#empresa').value;
   const periodo = $('#periodo').value;
-  busy($('#card-loader'), true);
+  $('#lbl-periodo').textContent = `Período: ${periodo.split('-').reverse().join('/')}`;
 
+  showCardLoader(true);
   try{
-    const data = (empresa==='TODAS') ? await getAllEmpresas(periodo) : await getEmpresaData(empresa, periodo);
-
-    $('#kpi-competencia').textContent = fmt.format(Number(data.saldoLoja||0));
-    $('#lbl-periodo').textContent = `Período: ${periodo.split('-').reverse().join('/')}`;
-
-    chartLine.data.labels = (data.serie||[]).map(p=>p.dia);
-    chartLine.data.datasets[0].data = (data.serie||[]).map(p=>p.saldo);
-    chartLine.update();
-
-    chartBar.data.labels = (data.serie||[]).map(p=>p.dia);
-    chartBar.data.datasets[0].data = (data.serie||[]).map(p=>p.movimentos||0);
-    chartBar.update();
-
-    // deixa disponível para o modal
-    window.__CACHE__ = { empresa, periodo, data };
+    const data = await fetchJSON(buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo));
+    if(!data.ok) throw new Error(data.error||'Falha no Apps Script');
+    $('#kpi-saldo').textContent = fmtBRL.format(data.saldoLoja||0); // valor da E4
+    window.__CACHE__ = {empresa, periodo, data};
   }catch(err){
-    console.error(err);
-    $('#kpi-competencia').textContent = '—';
-    $('#lbl-periodo').textContent = 'Falha ao carregar';
+    showToast('Erro ao carregar saldo: '+err.message);
+    $('#kpi-saldo').textContent = '—';
   }finally{
-    busy($('#card-loader'), false);
-    $('#last-update').textContent = new Date().toLocaleString('pt-BR');
+    showCardLoader(false);
   }
 }
 
-/* ========= UI: MODAL ========= */
-async function openModal(){
-  const empresa = $('#empresa').value;
-  const periodo = $('#periodo').value;
-  $('#modal-empresa').value = empresa;
-  $('#modal-periodo').value = periodo;
-
+/* ========= MODAL ========= */
+function openModal(){
+  $('#modal-empresa').value = $('#empresa').value;
+  $('#modal-periodo').value = $('#periodo').value;
   $('#modal-backdrop').classList.add('show');
-  await refreshModal();
+  $('#modal-backdrop').setAttribute('aria-hidden','false');
+  refreshModal();
 }
-function closeModal(){ $('#modal-backdrop').classList.remove('show'); }
-
+function closeModal(){
+  $('#modal-backdrop').classList.remove('show');
+  $('#modal-backdrop').setAttribute('aria-hidden','true');
+}
 async function refreshModal(){
   const empresa = $('#modal-empresa').value;
   const periodo = $('#modal-periodo').value;
-  busy($('#modal-loader'), true);
-
+  if(!modalLine){
+    modalLine = new Chart($('#modal-line'),{type:'line',data:{labels:[],datasets:[{label:'Saldo diário',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'}]}});
+    modalBar  = new Chart($('#modal-bar'), {type:'bar', data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
+  }
+  showModalLoader(true);
   try{
-    const data = (empresa==='TODAS') ? await getAllEmpresas(periodo) : await getEmpresaData(empresa, periodo);
+    const data = await fetchJSON(buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo));
+    if(!data.ok) throw new Error(data.error||'Falha no Apps Script');
 
-    $('#kpi-a').textContent = fmt.format(Number(data.totais?.entradas||0));
-    $('#kpi-b').textContent = fmt.format(Number(data.totais?.saidas||0));
-    $('#kpi-c').textContent = fmt.format(Number((data.totais?.entradas||0)-(data.totais?.saidas||0)));
-    $('#kpi-d').textContent = fmt.format(Number(data.saldoLoja||0));
+    $('#kpi-a').textContent = fmtBRL.format(data.totais?.entradas||0);
+    $('#kpi-b').textContent = fmtBRL.format(data.totais?.saidas||0);
+    $('#kpi-c').textContent = fmtBRL.format((data.totais?.entradas||0)-(data.totais?.saidas||0));
+    $('#kpi-d').textContent = fmtBRL.format(data.saldoLoja||0); // E4
 
-    // tabela (se agregada, não tem lançamentos)
     const tb = $('#livro-tabela tbody'); tb.innerHTML='';
     (data.lancamentos||[]).forEach(l=>{
-      const tr = document.createElement('tr');
+      const tr=document.createElement('tr');
       tr.innerHTML = `<td>${l.data||''}</td><td>${l.historico||''}</td><td>${l.complemento||''}</td>
-                      <td class="num in">${l.entrada?fmt.format(l.entrada):''}</td>
-                      <td class="num out">${l.saida?fmt.format(l.saida):''}</td>`;
+                      <td class="num in">${l.entrada?fmtBRL.format(l.entrada):''}</td>
+                      <td class="num out">${l.saida?fmtBRL.format(l.saida):''}</td>`;
       tb.appendChild(tr);
     });
 
-    modalLine.data.labels = (data.serie||[]).map(p=>p.dia);
-    modalLine.data.datasets[0].data = (data.serie||[]).map(p=>p.saldo);
-    modalLine.update();
-
-    modalBar.data.labels = (data.serie||[]).map(p=>p.dia);
-    modalBar.data.datasets[0].data = (data.serie||[]).map(p=>p.movimentos||0);
-    modalBar.update();
+    const labels = (data.serie||[]).map(d=>d.dia);
+    const saldo  = (data.serie||[]).map(d=>d.saldo);
+    const movs   = (data.serie||[]).map(d=>d.movimentos);
+    modalLine.data.labels = labels; modalLine.data.datasets[0].data = saldo; modalLine.update();
+    modalBar.data.labels  = labels; modalBar.data.datasets[0].data  = movs;  modalBar.update();
   }catch(err){
-    console.error(err);
-    ['kpi-a','kpi-b','kpi-c','kpi-d'].forEach(id=>$('#'+id).textContent='—');
-    $('#livro-tabela tbody').innerHTML='';
+    showToast('Erro ao carregar detalhes: '+err.message);
   }finally{
-    busy($('#modal-loader'), false);
+    showModalLoader(false);
   }
 }
 
 /* ========= BOOT ========= */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // mês atual por padrão
+  // mês atual
   $('#periodo').value = new Date().toISOString().slice(0,7);
   $('#last-update').textContent = new Date().toLocaleString('pt-BR');
 
-  initCharts();
-  loadCard();
+  // sparks dummy
+  spark('sp1',Array.from({length:12},()=>100+Math.random()*300));
+  spark('sp2',Array.from({length:12},()=>100+Math.random()*300));
+  spark('sp3',Array.from({length:12},()=>100+Math.random()*300));
+  spark('sp4',Array.from({length:12},()=>100+Math.random()*300));
+  spark('sp5',Array.from({length:12},()=>100+Math.random()*300));
+  spark('sp6',Array.from({length:12},()=>100+Math.random()*300));
+  spark('sp7',Array.from({length:12},()=>100+Math.random()*300));
+  spark('sp8',Array.from({length:12},()=>100+Math.random()*300));
 
-  // filtros
-  $('#btn-refresh').addEventListener('click', loadCard);
-  $('#empresa').addEventListener('change', loadCard);
-  $('#periodo').addEventListener('change', loadCard);
+  bootCharts();
+  loadSaldoCard();
 
-  // modal
-  $('#card-periodo').addEventListener('click', openModal);
+  // eventos
+  $('#btn-refresh').addEventListener('click', loadSaldoCard);
+  $('#empresa').addEventListener('change', loadSaldoCard);
+  $('#periodo').addEventListener('change', loadSaldoCard);
+
+  $('#card-saldo').addEventListener('click', openModal);
   $('#modal-close').addEventListener('click', closeModal);
-  $('#modal-backdrop').addEventListener('click', e=>{ if(e.target.id==='modal-backdrop') closeModal(); });
+  $('#modal-backdrop').addEventListener('click', (e)=>{ if(e.target.id==='modal-backdrop') closeModal(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
   $('#modal-empresa').addEventListener('change', refreshModal);
   $('#modal-periodo').addEventListener('change', refreshModal);
 });
