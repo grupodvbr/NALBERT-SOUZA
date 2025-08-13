@@ -31,6 +31,12 @@
     .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
     .mod .desc{color:var(--muted);font-size:12px}
     .mod .kpi{font-size:26px;font-weight:800;margin-top:10px;line-height:1.35}
+    /* 🔽 Fonte menor e layout compacto só para o card de Metas */
+    #kpi-metas{font-size:13px; line-height:1.35; font-weight:600}
+    #kpi-metas .emp{display:flex;justify-content:space-between;gap:10px; margin-top:6px}
+    #kpi-metas .emp-name{color:#cfd6e6; font-weight:700}
+    #kpi-metas .emp-val{color:#e9efff; white-space:nowrap}
+
     .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
     .spark{width:100%;height:54px;margin-top:10px}
     .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
@@ -105,7 +111,7 @@
 /* ====== CONFIG (DADOS REAIS) ====== */
 const CONFIG = {
   POPUP_URL: 'popup.html',
-  API_URL: 'https://script.google.com/macros/s/AKfycbwITuNC_KBSCYJ5PGsFcQ5eW1JhdxzRkyX81AAcxHDFL_PWYMu11V3njjESvH-AmJpx/exec', // Financeiro (Entradas/Saídas)
+  API_URL: 'https://script.google.com/macros/s/AKfycbwITuNC_KBSCYJ5PGsFcQ5eW1JhdxzRkyX81AAcxHDFL_PWYMu11V3njjESvH-AmJpx/exec', // Financeiro
   METAS_URL: 'https://script.google.com/macros/s/AKfycbzyiL6yNCj_FYWiQ2PS88mthToCvWM1wJ0q7CQy8asyg-59L8YezKzFY6d-lgQU0ni3/exec',
   CANCEL_URL: 'https://script.google.com/macros/s/AKfycby6kNirWdyaFymip0MFrqTNoItMgqkXJrzwf41Qxe2P1j8BoBILtnyws8o4f5sUdg-T3w/exec',
   DELIVERY_URL: 'https://script.google.com/macros/s/AKfycby3tGjtsUXcak51bcWG175VU4SWT2RV6pA9vJLyQxlMXSt3bGJFoi2R0YmDmuwzbcbOnw/exec',
@@ -123,9 +129,7 @@ function toNumber(v){
 }
 function buildUrl(base, params){
   const u = new URL(base);
-  Object.entries(params||{}).forEach(([k,v])=>{
-    if(v!=null && v!=='') u.searchParams.set(k,v);
-  });
+  Object.entries(params||{}).forEach(([k,v])=>{ if(v!=null && v!=='') u.searchParams.set(k,v); });
   return u.toString();
 }
 function yyyymm(dt){ return (dt||'').slice(0,7); }
@@ -202,29 +206,55 @@ function summarize(rows){
   return { entradas, saidas, labels, serieE, serieS, saldo: entradas - saidas };
 }
 
-/* ====== METAS ====== */
+/* ====== METAS (LISTA POR EMPRESA, SEM SOMAR) ====== */
 async function loadMetas(){
   const empresaSel = $('#empresa').value;
   const periodo = $('#periodo').value; // YYYY-MM
   try{
     const r = await fetch(CONFIG.METAS_URL, { cache:'no-store' });
     const data = await r.json();
-    const [ano, mes] = periodo.split('-');
-    let totalPrev = 0, totalReal = 0;
-    data.forEach(it=>{
+
+    // Filtra mês e, se aplicável, empresa
+    const mesDados = data.filter(it => {
+      const dt = (it.Data || it.data || '').slice(0,10);
       const emp = it.Empresa || it.empresa;
-      const dt = it.Data || it.data || '';
-      if(dt.startsWith(`${ano}-${mes}`) && (empresaSel==='TODAS' || emp===empresaSel)){
-        totalPrev += toNumber(it.Previsto);
-        totalReal += toNumber(it.Realizado);
+      const okMes = dt.startsWith(periodo);
+      const okEmp = (empresaSel==='TODAS') || (emp===empresaSel);
+      return okMes && okEmp;
+    });
+
+    if(mesDados.length===0){ $('#kpi-metas').textContent = '—'; return; }
+
+    // Agrupa por empresa e pega o registro mais recente do mês
+    const latestByEmp = {};
+    mesDados.forEach(it=>{
+      const emp = it.Empresa || it.empresa;
+      const dt  = (it.Data || it.data || '').slice(0,10);
+      if(!latestByEmp[emp] || dt > latestByEmp[emp].dt){
+        latestByEmp[emp] = { dt, previsto: toNumber(it.Previsto), realizado: toNumber(it.Realizado) };
       }
     });
-    const perc = totalPrev>0 ? (totalReal/totalPrev)*100 : 0;
-    $('#kpi-metas').innerHTML =
-      `<div style="font-size:13px;color:var(--muted)">${empresaSel}</div>
-       Meta: ${fmtBR.format(totalPrev)}<br>
-       Atingido: ${perc.toFixed(1)}% (${fmtBR.format(totalReal)})`;
-  }catch(e){ console.error('Metas erro', e); $('#kpi-metas').textContent='—'; }
+
+    // Monta a lista
+    const linhas = Object.entries(latestByEmp)
+      .sort(([a],[b]) => a.localeCompare(b))
+      .map(([emp, obj])=>{
+        const perc = obj.previsto>0 ? (obj.realizado/obj.previsto)*100 : 0;
+        return `<div class="emp">
+                  <span class="emp-name">${emp}</span>
+                  <span class="emp-val">Meta ${fmtBR.format(obj.previsto)} • ${perc.toFixed(1)}% (${fmtBR.format(obj.realizado)})</span>
+                </div>`;
+      }).join('');
+
+    // Cabeçalho pequeno (mostra mês)
+    const [y,m] = periodo.split('-');
+    const head = `<div style="font-size:12px;color:var(--muted);margin-bottom:2px">${m}/${y} • ${empresaSel==='TODAS'?'Grupo':empresaSel}</div>`;
+
+    $('#kpi-metas').innerHTML = head + linhas;
+  }catch(e){
+    console.error('Metas erro', e);
+    $('#kpi-metas').textContent='—';
+  }
 }
 
 /* ====== CANCELAMENTOS ====== */
@@ -236,7 +266,6 @@ async function loadCancel(){
     const data = await r.json();
     const filtrados = byMonth(data, periodo, empresaSel, r=>r.empresa);
     const total = sumBy(filtrados, r=>r.valor);
-    // pico do dia
     const byDay = {};
     filtrados.forEach(c=>{ byDay[c.data]=(byDay[c.data]||0)+toNumber(c.valor); });
     let picoData='—', picoVal=0;
@@ -255,7 +284,6 @@ async function loadDelivery(){
     const data = await r.json();
     const filtrados = byMonth(data, periodo, empresaSel, r=>r.empresa);
     const brutoTotal = sumBy(filtrados, r=>r.bruto);
-    // top plataforma por bruto
     const byPlat = {};
     filtrados.forEach(d=>{ const k=d.plataforma; byPlat[k]=(byPlat[k]||0)+toNumber(d.bruto); });
     let topPlat='—', topVal=0;
@@ -264,7 +292,7 @@ async function loadDelivery(){
   }catch(e){ console.error('Delivery erro', e); $('#kpi-delivery').textContent='—'; }
 }
 
-/* ====== NPS / AVALIAÇÕES ====== */
+/* ====== NPS ====== */
 const notasMap = { 'Ruim':1, 'Bom':2, 'Boa':2, 'Boas':2, 'Ótimo':3, 'Ótimas':3 };
 function notaCampo(a, campo){ return notasMap[(a[campo]||'').trim()]||0; }
 async function loadNPS(){
@@ -284,18 +312,16 @@ async function loadNPS(){
   }catch(e){ console.error('NPS erro', e); $('#kpi-nps').textContent='—'; }
 }
 
-/* ====== ABC DE VENDAS ====== */
+/* ====== ABC ====== */
 async function loadABC(){
   const empresaSel = $('#empresa').value;
   const periodo = $('#periodo').value;
   try{
     const r = await fetch(CONFIG.ABC_URL, { cache:'no-store' });
     const data = await r.json();
-    // Alguns painéis originais filtravam empresa específica; aqui respeitamos o seletor global
     const filtrados = byMonth(data, periodo, empresaSel, r=>r.empresa);
     const faturamento = sumBy(filtrados, r=>r.faturamento);
     const lucro = sumBy(filtrados, r=>r.lucro);
-    // top produto por faturamento
     const byProd = {};
     filtrados.forEach(d=>{ byProd[d.produto]=(byProd[d.produto]||0)+toNumber(d.faturamento); });
     let topProd='—', topVal=0;
@@ -313,12 +339,10 @@ async function loadIndex(){
     const rows = await fetchMovements(empresa, periodo);
     const s = summarize(rows);
 
-    // KPI período (por enquanto mostra o mês) + saldo no card Financeiro
     $('#kpi-competencia').textContent = periodo.split('-').reverse().join('/');
     const elFin = document.getElementById('kpi-fin');
     if(elFin) elFin.textContent = fmtBR.format(s.saldo);
 
-    // Gráficos Financeiro
     if(!chartLine) chartLine = makeLine(document.getElementById('line-timeline'));
     if(!chartBar)  chartBar  = makeBar(document.getElementById('bar-days'));
 
@@ -331,14 +355,12 @@ async function loadIndex(){
     chartBar.data.datasets[0].data = s.serieE.map((v,i)=> v + (s.serieS[i]||0));
     chartBar.update();
 
-    // ===== Indicadores dos outros módulos (todos respeitam empresa/periodo) =====
     await Promise.all([
       loadMetas(),
       loadCancel(),
       loadDelivery(),
       loadNPS(),
       loadABC()
-      // loadTravas(); loadConciliacao(); // (quando os endpoints forem definidos)
     ]);
 
     $('#last-update').textContent = new Date().toLocaleString('pt-BR');
