@@ -88,7 +88,7 @@
       </div>
     </header>
 
-    <!-- Módulos do seu molde (mantidos) -->
+    <!-- Módulos (mantidos do molde) -->
     <section class="modules">
       <a class="mod"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="m1">—</div><canvas class="spark" id="sp1"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
       <a class="mod"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="m2">—</div><canvas class="spark" id="sp2"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
@@ -173,28 +173,40 @@
 /* ========= CONFIG ========= */
 const CONFIG = {
   APIS: {
-    // COLE AQUI a URL /exec do seu Apps Script:
+    // TROQUE pelo /exec do seu Apps Script
     FINANCEIRO: 'https://script.google.com/macros/s/AKfycbxjHA_yE21w4EiT3Ko3gvwSX0D9FUdwhFlYsHjhcBgv42zvcA91PsLKxThfV2-k8ro1Cw/exec'
   }
 };
+
 const $ = s => document.querySelector(s);
 const fmtBRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 
-/* helpers UI */
+/* UI helpers */
 function spark(el,data){
   const ctx=document.getElementById(el);
+  if(!ctx) return;
   const g=ctx.getContext('2d').createLinearGradient(0,0,0,60);
   g.addColorStop(0,'rgba(0,209,255,.35)'); g.addColorStop(1,'rgba(255,46,136,.05)');
-  return new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data,borderWidth:2,pointRadius:0,tension:.35,fill:true,backgroundColor:g,borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
+  new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data,borderWidth:2,pointRadius:0,tension:.35,fill:true,backgroundColor:g,borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
 }
 function showToast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4000);}
 function showCardLoader(on){ $('#card-loader').classList.toggle('show',!!on); }
 function showModalLoader(on){ $('#modal-loader').classList.toggle('show',!!on); }
 function setBtnLoading(on){ const b=$('#btn-refresh'); if(on){ b.disabled=true; b.dataset.t=b.textContent; b.textContent='Carregando…'; } else { b.disabled=false; b.textContent=b.dataset.t||'Atualizar'; } }
-function buildUrl(base,empresa,periodo){ const u=new URL(base); if(empresa && empresa!=='TODAS') u.searchParams.set('empresa',empresa); if(periodo) u.searchParams.set('periodo',periodo); return u.toString(); }
-async function fetchJSON(url){ const r=await fetch(url,{headers:{'cache-control':'no-cache'}}); const t=await r.text(); try{ return JSON.parse(t); }catch{ throw new Error('API não retornou JSON'); } }
+function buildUrl(base,empresa,periodo){
+  if(!base){ throw new Error('URL da API não configurada'); }
+  const u=new URL(base);
+  if(empresa && empresa!=='TODAS') u.searchParams.set('empresa',empresa);
+  if(periodo) u.searchParams.set('periodo',periodo);
+  return u.toString();
+}
+async function fetchJSON(url){
+  const r=await fetch(url,{headers:{'cache-control':'no-cache'}});
+  const t=await r.text();
+  try{ return JSON.parse(t); }catch{ throw new Error('API não retornou JSON'); }
+}
 
-/* charts de exemplo */
+/* charts de vitrine */
 let modalLine, modalBar;
 function bootCharts(){
   new Chart($('#line-timeline'),{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]}}); 
@@ -203,11 +215,12 @@ function bootCharts(){
 
 /* FINANCEIRO (E4) */
 async function loadSaldoCard(){
-  const empresa = $('#empresa').value;
-  const periodo = $('#periodo').value;
-  $('#lbl-periodo').textContent = `Período: ${periodo.split('-').reverse().join('/')}`;
-  showCardLoader(true); setBtnLoading(true);
   try{
+    const empresa = $('#empresa').value;
+    const periodo = $('#periodo').value;
+    $('#lbl-periodo').textContent = `Período: ${periodo.split('-').reverse().join('/')}`;
+    showCardLoader(true); setBtnLoading(true);
+
     const data = await fetchJSON(buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo));
     if(!data.ok) throw new Error(data.error||'Falha no Apps Script');
     $('#kpi-saldo').textContent = fmtBRL.format(data.saldoLoja||0);
@@ -275,9 +288,10 @@ async function refreshModal(){
 
 /* BOOT */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // mês atual (YYYY-MM)
-  $('#periodo').value = new Date().toISOString().slice(0,7);
-  $('#modal-periodo').value = $('#periodo').value;
+  // mês atual (YYYY-MM) como padrão
+  const ym = new Date().toISOString().slice(0,7);
+  $('#periodo').value = ym;
+  $('#modal-periodo').value = ym;
   $('#last-update').textContent = new Date().toLocaleString('pt-BR');
 
   // mini-sparks decorativos
@@ -288,6 +302,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   bootCharts();
   loadSaldoCard();
 
+  // eventos
   $('#btn-refresh').addEventListener('click', loadSaldoCard);
   $('#empresa').addEventListener('change', loadSaldoCard);
   $('#periodo').addEventListener('change', loadSaldoCard);
