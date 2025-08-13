@@ -3,48 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Painel – Livro de Caixa</title>
+  <title>Livro de Caixa — Pop‑up</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0a0a0a;--panel:#111;--muted:#1a1a1a;--ink:#f6f7fb;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;--accent:#22d3ee;}
+    :root{--bg:#0a0a0a;--panel:#111;--muted:#161616;--ink:#f6f7fb;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,Segoe UI,Arial}
-    header{padding:18px 20px;border-bottom:1px solid #222;display:flex;gap:16px;align-items:center}
-    header h1{font-size:18px;margin:0;font-weight:700}
+    header{padding:16px 18px;border-bottom:1px solid #1f1f1f;display:flex;justify-content:space-between;align-items:center}
+    h1{font-size:16px;margin:0}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid #2a2a2a;background:#0e0e0e;padding:6px 10px;border-radius:999px;font-size:12px}
     .wrap{max-width:1180px;margin:0 auto;padding:18px}
-    .panel{background:var(--panel);border:1px solid #1d1d1d;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .panel{background:var(--panel);border:1px solid #1d1d1d;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
     .row{display:grid;gap:12px}
     .row.cols-4{grid-template-columns:repeat(4,1fr)}
-    .row.cols-3{grid-template-columns:repeat(3,1fr)}
     .card{background:var(--muted);border:1px solid #222;border-radius:14px;padding:14px}
-    .kpi .label{opacity:.8;font-size:12px}
-    .kpi .value{font-size:22px;font-weight:700;margin-top:4px}
+    .kpi .label{opacity:.85;font-size:12px}
+    .kpi .value{font-size:22px;font-weight:700;margin-top:6px}
     .kpi.ok .value{color:var(--ok)}
     .kpi.bad .value{color:var(--bad)}
     .kpi.warn .value{color:var(--warn)}
-    .filters{display:flex;gap:10px;flex-wrap:wrap}
-    select,input{background:#0e0e0e;border:1px solid #222;color:var(--ink);border-radius:10px;padding:10px}
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid #222}
-    th{font-weight:600;text-align:left;background:#151515;position:sticky;top:0}
-    tbody tr:hover{background:#111}
+    th{position:sticky;top:0;background:#151515;text-align:left}
     .right{text-align:right}
-    .pill{display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;border:1px solid #222;background:#0e0e0e}
-    footer{opacity:.7;padding:14px}
     .hint{opacity:.7}
     .empty{opacity:.6;text-align:center;padding:24px}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    select,input{background:#0e0e0e;border:1px solid #222;color:var(--ink);border-radius:10px;padding:8px 10px}
   </style>
 </head>
 <body>
   <header>
-    <h1>Livro de Caixa – Painel</h1>
-    <span class="pill" id="updated">…</span>
+    <h1 id="ttl">Livro de Caixa — Pop‑up</h1>
+    <span class="pill"><span class="hint">Atualizado:</span> <span id="updated">—</span></span>
   </header>
 
   <div class="wrap">
-    <div class="panel" style="padding:16px">
+    <div class="panel">
+      <!-- Filtros locais (recebem valores do index, mas também podem ser usados no pop-up) -->
       <div class="filters">
         <label>
           <span class="hint">Empresa</span><br>
@@ -58,11 +56,10 @@
           <span class="hint">Data final</span><br>
           <input type="date" id="dtFim">
         </label>
-        <label style="flex:1 1 240px">
+        <label style="flex:1 1 260px">
           <span class="hint">Buscar</span><br>
           <input type="text" id="busca" placeholder="histórico ou complemento">
         </label>
-        <button id="btnExport" class="pill">Exportar CSV</button>
       </div>
 
       <div class="row cols-4" style="margin-top:12px">
@@ -79,13 +76,13 @@
           <div class="value">—</div>
         </div>
         <div class="card kpi" id="kpi-saldo">
-          <div class="label">Saldo na Loja</div>
+          <div class="label">Saldo no Período</div>
           <div class="value">—</div>
         </div>
       </div>
 
       <div class="card" style="margin-top:12px">
-        <div style="overflow:auto;max-height:60vh">
+        <div style="overflow:auto;max-height:66vh">
           <table id="tbl">
             <thead>
               <tr>
@@ -103,150 +100,140 @@
       </div>
 
     </div>
-
-    <footer>💡 Dica: digite parte do histórico (ex.: "caixa dia").
-    </footer>
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjlnQFhaCjGXmjIirF4qtUFReN4RSwYi4vE1oo8ORgydKz7d4WOiI2mA75ukC9B1DzPA/exec"; // ← Substitua
+    // ====== CONFIGURE AQUI ======
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqg8GEPFmod6W1xPxneXHAC6LRmnNAastew3QJtMpsf8mWwRowcZKZoNgRQskBM0-p/exec?action=list";
+    // =============================
 
-    let raw = null;
-    let current = null; // empresa selecionada
+    const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+    let raw = null;       // payload completo do servidor
+    let current = null;   // empresa selecionada
 
-    const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
+    // Carrega dados do servidor
     async function load() {
-      const res = await fetch(WEB_APP_URL, { cache: 'no-store' });
+      const res = await fetch(WEB_APP_URL,{cache:'no-store'});
       const data = await res.json();
       if (data.error) throw new Error(data.message || 'Falha ao carregar');
       raw = data;
-      document.getElementById('updated').textContent = 'Atualizado: ' + new Date(data.generatedAt).toLocaleString('pt-BR');
-      buildEmpresaOptions(data.companies.map(c => c.company));
-      // Seleciona a primeira por padrão
-      document.getElementById('empresa').value = data.companies[0]?.company || '';
-      onChangeEmpresa();
-    }
-
-    function buildEmpresaOptions(list) {
-      const sel = document.getElementById('empresa');
-      sel.innerHTML = list.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
-      sel.onchange = onChangeEmpresa;
-      document.getElementById('dtIni').onchange = render;
-      document.getElementById('dtFim').onchange = render;
-      document.getElementById('busca').oninput = render;
-      document.getElementById('btnExport').onclick = exportCsv;
-    }
-
-    function onChangeEmpresa() {
-      const name = document.getElementById('empresa').value;
-      current = raw.companies.find(c => c.company === name);
-      // define período padrão: mês atual
+      document.getElementById('updated').textContent = new Date(data.generatedAt).toLocaleString('pt-BR');
+      mountEmpresaOptions();
+      // Default: primeira empresa + mês atual
+      const first = raw.companies?.[0]?.company || '';
+      document.getElementById('empresa').value = first;
       const now = new Date();
-      const first = new Date(now.getFullYear(), now.getMonth(), 1);
-      const last  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      document.getElementById('dtIni').valueAsDate = first;
-      document.getElementById('dtFim').valueAsDate = last;
+      document.getElementById('dtIni').valueAsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      document.getElementById('dtFim').valueAsDate = new Date(now.getFullYear(), now.getMonth()+1, 0);
       render();
     }
 
-    function render() {
-      if (!current) return;
-      const dtIni = document.getElementById('dtIni').value ? new Date(document.getElementById('dtIni').value) : null;
-      const dtFim = document.getElementById('dtFim').value ? new Date(document.getElementById('dtFim').value) : null;
-      const q = document.getElementById('busca').value.trim().toLowerCase();
-
-      const rows = (current.items || []).filter(it => {
-        // filtro de data
-        let okDate = true;
-        if (dtIni) okDate = okDate && it.data && new Date(it.data) >= dtIni;
-        if (dtFim) okDate = okDate && it.data && new Date(it.data) <= new Date(dtFim.getFullYear(), dtFim.getMonth(), dtFim.getDate(), 23,59,59);
-        // filtro de busca
-        const text = (it.historico + ' ' + it.complemento).toLowerCase();
-        const okText = !q || text.includes(q);
-        return okDate && okText;
-      });
-
-      // KPIs do período
-      const entradas = rows.reduce((s, r) => s + (r.entrada||0), 0);
-      const saidas   = rows.reduce((s, r) => s + (r.saida||0), 0);
-      const saldoLoja = (current.saldoImplantacao||0) + entradas - saidas; // preferimos o cálculo do período
-
-      setKpi('kpi-saldo-impl', current.saldoImplantacao, 'warn');
-      setKpi('kpi-entradas', entradas, 'ok');
-      setKpi('kpi-saidas', saidas, 'bad');
-      setKpi('kpi-saldo', saldoLoja, saldoLoja >= 0 ? 'ok' : 'bad');
-
-      const tbody = document.querySelector('#tbl tbody');
-      tbody.innerHTML = rows.map(r => `
-        <tr>
-          <td>${r.data ? new Date(r.data).toLocaleDateString('pt-BR') : ''}</td>
-          <td>${escapeHtml(r.historico||'')}</td>
-          <td>${escapeHtml(r.complemento||'')}</td>
-          <td class="right">${r.entrada ? fmt.format(r.entrada) : ''}</td>
-          <td class="right">${r.saida ? fmt.format(r.saida) : ''}</td>
-        </tr>
-      `).join('');
-
-      document.getElementById('empty').hidden = rows.length > 0;
+    function mountEmpresaOptions(){
+      const sel = document.getElementById('empresa');
+      sel.innerHTML = (raw.companies||[]).map(c=>`<option>${escapeHtml(c.company)}</option>`).join('');
+      sel.onchange = render;
+      document.getElementById('dtIni').onchange = render;
+      document.getElementById('dtFim').onchange = render;
+      document.getElementById('busca').oninput = render;
     }
 
-    function setKpi(id, value, cls) {
-      const el = document.getElementById(id);
-      el.classList.remove('ok','bad','warn');
-      if (cls) el.classList.add(cls);
-      el.querySelector('.value').textContent = fmt.format(value || 0);
+    function getFilters(){
+      return {
+        company: document.getElementById('empresa').value,
+        dtIni: document.getElementById('dtIni').value,
+        dtFim: document.getElementById('dtFim').value,
+        q: document.getElementById('busca').value.trim().toLowerCase()
+      };
     }
 
-    function exportCsv() {
-      if (!current) return;
-      const dtIni = document.getElementById('dtIni').value;
-      const dtFim = document.getElementById('dtFim').value;
-      const q = document.getElementById('busca').value.trim().toLowerCase();
+    function applyFilters(f){
+      if (!raw) return [];
+      current = raw.companies.find(c=>c.company===f.company) || raw.companies[0];
+      if (!current) return [];
 
-      const rows = (current.items || []).filter(it => {
+      const dtIni = f.dtIni ? new Date(f.dtIni) : null;
+      const dtFim = f.dtFim ? new Date(f.dtFim) : null;
+
+      const rows = (current.items||[]).filter(it=>{
         let ok = true;
-        if (dtIni) ok = ok && it.data && new Date(it.data) >= new Date(dtIni);
-        if (dtFim) ok = ok && it.data && new Date(it.data) <= new Date(dtFim + 'T23:59:59');
-        const text = (it.historico + ' ' + it.complemento).toLowerCase();
-        if (q) ok = ok && text.includes(q);
+        if (dtIni) ok = ok && it.data && new Date(it.data) >= dtIni;
+        if (dtFim) ok = ok && it.data && new Date(it.data) <= new Date(dtFim.getFullYear(), dtFim.getMonth(), dtFim.getDate(), 23,59,59);
+        if (f.q){
+          const text = (it.historico+' '+it.complemento).toLowerCase();
+          ok = ok && text.includes(f.q);
+        }
         return ok;
       });
-
-      const header = ['Data','Histórico','Complemento','Entrada','Saída'];
-      const csv = [header.join(';')].concat(rows.map(r => [
-        r.data ? new Date(r.data).toLocaleDateString('pt-BR') : '',
-        safeCsv(r.historico),
-        safeCsv(r.complemento),
-        r.entrada?.toString().replace('.',','),
-        r.saida?.toString().replace('.',',')
-      ].join(';'))).join('\n');
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `livro_caixa_${current.company.replace(/\s+/g,'_')}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      return rows;
     }
 
-    function safeCsv(s){
-      const t = (s||'').toString().replace(/;/g, ',');
-      return '"'+t.replace(/"/g,'""')+'"';
+    function render(){
+      const f = getFilters();
+      const rows = applyFilters(f);
+
+      const entradas = rows.reduce((s,r)=>s+(r.entrada||0),0);
+      const saidas   = rows.reduce((s,r)=>s+(r.saida||0),0);
+      const saldoPeriodo = (current?.saldoImplantacao||0) + entradas - saidas;
+
+      setKpi('kpi-saldo-impl', current?.saldoImplantacao||0, 'warn');
+      setKpi('kpi-entradas', entradas, 'ok');
+      setKpi('kpi-saidas',   saidas,   'bad');
+      setKpi('kpi-saldo',    saldoPeriodo, saldoPeriodo>=0?'ok':'bad');
+
+      const tbody = document.querySelector('#tbl tbody');
+      tbody.innerHTML = rows.map(r=>`
+        <tr>
+          <td>${r.data?new Date(r.data).toLocaleDateString('pt-BR'):''}</td>
+          <td>${escapeHtml(r.historico||'')}</td>
+          <td>${escapeHtml(r.complemento||'')}</td>
+          <td class="right">${r.entrada?fmt.format(r.entrada):''}</td>
+          <td class="right">${r.saida?fmt.format(r.saida):''}</td>
+        </tr>
+      `).join('');
+      document.getElementById('empty').hidden = rows.length>0;
+      document.getElementById('ttl').textContent = `Livro de Caixa — ${current?.company||''}`;
+    }
+
+    function setKpi(id,val,cls){
+      const el=document.getElementById(id);
+      el.classList.remove('ok','bad','warn');
+      if(cls) el.classList.add(cls);
+      el.querySelector('.value').textContent = fmt.format(val||0);
     }
 
     function escapeHtml(s){
-      return (s||'').toString()
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/\"/g,'&quot;')
-        .replace(/'/g,'&#39;');
+      return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
-    load().catch(err => {
-      alert('Erro ao carregar: '+ err.message);
+    // ====== Sincronização com a janela principal via postMessage ======
+    // 1) Lê filtros passados por querystring (company, dtIni, dtFim, q)
+    function readQs(){
+      const p = new URLSearchParams(location.search);
+      const company = p.get('company');
+      const dtIni = p.get('dtIni');
+      const dtFim = p.get('dtFim');
+      const q = p.get('q');
+      if (company) document.getElementById('empresa').value = company;
+      if (dtIni) document.getElementById('dtIni').value = dtIni;
+      if (dtFim) document.getElementById('dtFim').value = dtFim;
+      if (q) document.getElementById('busca').value = decodeURIComponent(q);
+    }
+
+    // 2) Recebe atualizações do index.html
+    window.addEventListener('message', (evt)=>{
+      const { type, payload } = evt.data||{};
+      if (type === 'livrocaixa-filters'){
+        if (payload.company) document.getElementById('empresa').value = payload.company;
+        if (payload.dtIni) document.getElementById('dtIni').value = payload.dtIni;
+        if (payload.dtFim) document.getElementById('dtFim').value = payload.dtFim;
+        document.getElementById('busca').value = payload.q||'';
+        render();
+      }
+    });
+
+    // Inicializa
+    load().then(()=>{ readQs(); render(); }).catch(err=>{
+      alert('Erro ao carregar: '+err.message);
       console.error(err);
     });
   </script>
