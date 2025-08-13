@@ -38,7 +38,7 @@
     .mod:hover{transform:translateY(-2px)}
     .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
     .mod .desc{color:var(--muted);font-size:12px}
-    .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
+    .mod .kpi{font-size:26px;font-weight:800;margin-top:10px;min-height:32px}
     .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
     .spark{width:100%;height:54px;margin-top:10px}
     .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
@@ -65,7 +65,7 @@
     .toast.show{display:block;animation:fadeIn .15s ease}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-    /* modal com IFRAME */
+    /* modal + loader */
     .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:999}
     .modal-backdrop.show{display:grid}
     .modal{width:min(1200px,92vw);height:min(86vh,900px);display:flex;flex-direction:column;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow)}
@@ -73,11 +73,8 @@
     .modal .close{appearance:none;border:1px solid #2a2a2a;background:#0f0f0f;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
     .modal .frame-wrap{flex:1;position:relative}
     .modal iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-bottom-left-radius:22px;border-bottom-right-radius:22px;background:#0b0b0b}
-    /* loader dentro do modal */
-    .modal .loading{
-      position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35)
-    }
-    .modal .loading.show{display:grid}
+    .modal .loading{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.25)}
+    .modal .loading.hidden{display:none}
 
     @media (max-width:1280px){.modules{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}}
   </style>
@@ -105,24 +102,24 @@
 
     <!-- Módulos -->
     <section class="modules">
-      <a class="mod" data-page="index.metas.html"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="m1">—</div><canvas class="spark" id="sp1"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
-      <a class="mod" data-page="index.cancelamentos.html"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="m2">—</div><canvas class="spark" id="sp2"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
-      <a class="mod" data-page="index.travas.html"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="m3">—</div><canvas class="spark" id="sp3"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
-      <a class="mod" data-page="index.caixas.html"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="m4">—</div><canvas class="spark" id="sp4"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
-      <a class="mod" data-page="index.delivery.html"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi" id="m5">—</div><canvas class="spark" id="sp5"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
-      <a class="mod" data-page="index.conciliacao.html"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi" id="m6">—</div><canvas class="spark" id="sp6"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
-      <a class="mod" data-page="index.nps.html"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi" id="m7">—</div><canvas class="spark" id="sp7"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
-      <a class="mod" data-page="index.midias.html"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi" id="m8">—</div><canvas class="spark" id="sp8"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.metas.html"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="m1">—</div><canvas class="spark" id="sp1"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.cancelamentos.html"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="m2">—</div><canvas class="spark" id="sp2"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.travas.html"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="m3">—</div><canvas class="spark" id="sp3"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.caixas.html"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="m4">—</div><canvas class="spark" id="sp4"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.delivery.html"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi" id="m5">—</div><canvas class="spark" id="sp5"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.conciliacao.html"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi" id="m6">—</div><canvas class="spark" id="sp6"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.nps.html"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi" id="m7">—</div><canvas class="spark" id="sp7"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
+      <a class="mod" role="button" tabindex="0" data-page="./index.midias.html"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi" id="m8">—</div><canvas class="spark" id="sp8"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
     </section>
 
     <!-- Card Saldo -->
     <section class="grid" style="margin-top:22px">
-      <div class="card card-click" id="card-saldo" role="button" tabindex="0" data-page="index.caixas.html">
+      <div class="card card-click" id="card-saldo" role="button" tabindex="0" data-page="./index.caixas.html">
         <div class="overlay" id="card-loader"><div><span class="spinner"></span> Carregando…</div></div>
         <h3>Saldo na Loja (mês)</h3>
         <div class="kpi-line">
           <div class="kpi-value" id="kpi-saldo">—</div>
-          <span class="pill" id="pill-detalhar">Detalhar</span>
+          <span class="pill">Detalhar</span>
         </div>
         <div class="subtitle" id="lbl-periodo" style="margin-top:6px;color:var(--muted);font-size:12px">—</div>
       </div>
@@ -147,7 +144,7 @@
         <button class="close" id="modal-close" aria-label="Fechar (Esc)">✕</button>
       </header>
       <div class="frame-wrap">
-        <div id="modal-loading" class="loading"><div><span class="spinner"></span></div></div>
+        <div id="modal-loading" class="loading"><span class="spinner"></span></div>
         <iframe id="modal-frame" src="about:blank" title="Conteúdo"></iframe>
       </div>
     </div>
@@ -172,11 +169,15 @@ function spark(el,data){
   const ctx=document.getElementById(el); if(!ctx) return;
   const g=ctx.getContext('2d').createLinearGradient(0,0,0,60);
   g.addColorStop(0,'rgba(0,209,255,.35)'); g.addColorStop(1,'rgba(255,46,136,.05)');
-  new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data,borderWidth:2,pointRadius:0,tension:.35,fill:true,backgroundColor:g,borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
+  try{
+    new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data,borderWidth:2,pointRadius:0,tension:.35,fill:true,backgroundColor:g,borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
+  }catch(e){ console.warn('Spark falhou', e); }
 }
 function bootCharts(){
-  new Chart($('#line-timeline'),{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]}}); 
-  new Chart($('#bar-days'),{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]}}); 
+  try{
+    new Chart($('#line-timeline'),{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]}});
+    new Chart($('#bar-days'),{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]}});
+  }catch(e){ console.warn('Charts falharam', e); }
 }
 function showToast(msg){const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4500);}
 
@@ -203,17 +204,16 @@ async function fetchJSON(url){
 /* ================= CORE ================= */
 async function loadSaldoCard(){
   const empresa = $('#empresa').value;
-  const periodo = $('#periodo').value;
+  const periodo = $('#periodo').value || new Date().toISOString().slice(0,7);
   $('#lbl-periodo').textContent = `Período: ${periodo.split('-').reverse().join('/')}`;
 
   showCardLoader(true); setBtnLoading(true);
   try{
     const data = await fetchJSON(buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo));
     if(data.ok === false) throw new Error(data.error||'Falha no Apps Script');
-
-    // valor da célula E4 (saldo na loja)
-    $('#kpi-saldo').textContent = fmtBRL.format(Number(data.saldoLoja||0));
+    $('#kpi-saldo').textContent = fmtBRL.format(Number(data.saldoLoja||0)); // E4
   }catch(err){
+    console.error(err);
     $('#kpi-saldo').textContent = '—';
     showToast('Erro ao carregar saldo: '+err.message);
   }finally{
@@ -222,48 +222,48 @@ async function loadSaldoCard(){
 }
 
 /* ================= MODAL (IFRAME) ================= */
-let modalTimeout = null;
-function openModal(pageTitle, pagePath){
+async function openModal(pageTitle, pagePath){
+  try{
+    // verificação rápida: o arquivo existe?
+    const headResp = await fetch(pagePath, {method:'HEAD'});
+    if(!headResp.ok){ showToast('Arquivo não encontrado: '+pagePath); return; }
+  }catch(e){
+    console.warn('HEAD falhou, tentando assim mesmo…', e);
+  }
+
   const empresa = encodeURIComponent($('#empresa').value);
-  const periodo = encodeURIComponent($('#periodo').value);
+  const periodo = encodeURIComponent($('#periodo').value || new Date().toISOString().slice(0,7));
 
   const frame = $('#modal-frame');
-  const loading = $('#modal-loading');
-  loading.classList.add('show');
-  frame.src = 'about:blank'; // limpa antes
-
-  // define src com filtros
-  frame.src = `${pagePath}?empresa=${empresa}&periodo=${periodo}`;
   $('#modal-title').textContent = pageTitle || 'Detalhes';
-
-  // timeout de segurança (ex.: arquivo inexistente)
-  clearTimeout(modalTimeout);
-  modalTimeout = setTimeout(()=>{
-    if(loading.classList.contains('show')){
-      loading.classList.remove('show');
-      showToast('Não foi possível abrir a página solicitada.');
-    }
-  }, 10000);
-
-  frame.onload = () => { loading.classList.remove('show'); clearTimeout(modalTimeout); };
+  $('#modal-loading').classList.remove('hidden');
+  frame.src = `${pagePath}?empresa=${empresa}&periodo=${periodo}`;
 
   const b = $('#modal-backdrop');
-  b.classList.add('show');
-  b.setAttribute('aria-hidden','false');
+  b.classList.add('show'); b.setAttribute('aria-hidden','false');
+
+  frame.onload = ()=>$('#modal-loading').classList.add('hidden');
+  // não existe onerror confiável em iframe; usar timeout para exibir aviso se travar
+  setTimeout(()=>{ 
+    if($('#modal-backdrop').classList.contains('show') && !$('#modal-loading').classList.contains('hidden')){
+      $('#modal-loading').classList.add('hidden');
+      showToast('Não foi possível carregar o conteúdo.');
+    }
+  }, 6000);
 }
 function closeModal(){
   const b = $('#modal-backdrop');
   b.classList.remove('show');
   b.setAttribute('aria-hidden','true');
   $('#modal-frame').src = 'about:blank';
-  clearTimeout(modalTimeout);
 }
 
 /* ================= BOOT ================= */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // MÊS ATUAL padrão (YYYY-MM) + última atualização
-  const ym = new Date().toISOString().slice(0,7);
-  $('#periodo').value = ym;
+  // mês atual padrão com fallback para navegadores antigos
+  const ymNow = new Date().toISOString().slice(0,7);
+  const monthInput = $('#periodo');
+  try{ monthInput.value = ymNow; }catch{ monthInput.setAttribute('value', ymNow); }
   $('#last-update').textContent = new Date().toLocaleString('pt-BR');
 
   // sparks decorativos
@@ -281,14 +281,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
   $('#periodo').addEventListener('change', loadSaldoCard);
 
   // abrir modal ao clicar no card de saldo
-  $('#card-saldo').addEventListener('click', ()=> openModal('Livro de Caixa', 'index.caixas.html'));
-  $('#pill-detalhar').addEventListener('click', (e)=>{ e.stopPropagation(); openModal('Livro de Caixa', 'index.caixas.html'); });
+  $('#card-saldo').addEventListener('click', ()=>openModal('Livro de Caixa', './index.caixas.html'));
 
   // abrir modal ao clicar em QUALQUER módulo (usa data-page)
   document.addEventListener('click', (ev)=>{
     const el = ev.target.closest('.mod');
     if(!el) return;
-    const page = el.getAttribute('data-page') || 'index.caixas.html';
+    const page = el.getAttribute('data-page') || './index.caixas.html';
     const title = el.querySelector('h4')?.textContent?.trim() || 'Detalhes';
     openModal(title, page);
   });
@@ -297,10 +296,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   $('#modal-close').addEventListener('click', closeModal);
   $('#modal-backdrop').addEventListener('click', (e)=>{ if(e.target.id==='modal-backdrop') closeModal(); });
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+});
 
-  // handler global de erros não tratados
-  window.addEventListener('unhandledrejection', (e)=> showToast('Erro: ' + (e.reason?.message || e.reason || 'desconhecido')));
-  window.addEventListener('error', (e)=> showToast('Erro inesperado: ' + (e.message || e.error)));
+// Captura erros JS globais para facilitar debug e não derrubar o restante
+window.addEventListener('error', (e)=>{
+  console.error('Erro JS:', e.message, e.filename, e.lineno);
+  showToast('Erro na página: ' + e.message);
 });
 </script>
 </body>
