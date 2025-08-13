@@ -16,7 +16,7 @@
   *{box-sizing:border-box;scrollbar-width:none}
   *::-webkit-scrollbar{display:none}
   html,body{margin:0;height:100%;overflow:hidden}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);overflow-y:auto}
   header{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)),var(--panel);border-bottom:1px solid #1c1c1c}
   .wrap{max-width:1200px;margin:0 auto;padding:12px 18px}
   .title{font-weight:700;font-size:18px}
@@ -83,14 +83,25 @@ const $ = s=>document.querySelector(s);
 const money = n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n||0);
 const toNumber=v=>typeof v==='number'?v:Number(String(v||'').replace(/[^0-9,-]/g,'').replace(/\./g,'').replace(',','.'))||0;
 
-function build(base,params){const u=new URL(base);Object.entries(params).forEach(([k,v])=>v!=null&&v!==''&&u.searchParams.set(k,v));return u;}
+function build(base,params){
+  const u=new URL(base);
+  Object.entries(params).forEach(([k,v])=>v!=null&&v!==''&&u.searchParams.set(k,v));
+  return u;
+}
+
 async function fetchRows(empresa,periodo){
   const url = build(API,{ action:'list', empresa, periodo });
   const r = await fetch(url,{cache:'no-store'});
   if(!r.ok) throw new Error('Falha ao carregar');
   const data = await r.json();
-  return Array.isArray(data)?data:(data.items||data.rows||[]);
+  // Mantém saldos junto com items
+  return {
+    items: data.items || data.rows || [],
+    saldo_implantacao: data.saldo_implantacao ?? data.SaldoImplantacao ?? null,
+    saldo_loja: data.saldo_loja ?? data.SaldoLoja ?? null
+  };
 }
+
 function filterRows(rows, q){
   if(!q) return rows;
   const s = q.trim().toLowerCase();
@@ -99,6 +110,7 @@ function filterRows(rows, q){
     String(r.complemento||r.Complemento||'').toLowerCase().includes(s)
   );
 }
+
 function render(rows){
   const tb = $('#tbl tbody'); tb.innerHTML='';
   let e=0,s=0;
@@ -117,20 +129,23 @@ function render(rows){
   $('#k-entradas').textContent = money(e);
   $('#k-saidas').textContent   = money(s);
 }
+
 async function load(){
   const empresa=$('#empresa').value, periodo=$('#periodo').value;
   const all = await fetchRows(empresa, periodo);
-  const headerSaldo = toNumber(all?.saldo_implantacao ?? all?.SaldoImplantacao);
-  const saldoLoja   = toNumber(all?.saldo_loja ?? all?.SaldoLoja);
-  if(headerSaldo) $('#k-saldo-impl').textContent = money(headerSaldo);
-  if(saldoLoja)   $('#k-saldo-loja').textContent = money(saldoLoja);
-  render(filterRows(all, $('#busca').value));
+  const headerSaldo = toNumber(all.saldo_implantacao);
+  const saldoLoja   = toNumber(all.saldo_loja);
+  if(headerSaldo || headerSaldo===0) $('#k-saldo-impl').textContent = money(headerSaldo);
+  if(saldoLoja   || saldoLoja===0)   $('#k-saldo-loja').textContent  = money(saldoLoja);
+  render(filterRows(all.items, $('#busca').value));
 }
+
 function fromQS(){
   const p=new URLSearchParams(location.search);
   if(p.has('empresa')) $('#empresa').value = p.get('empresa');
   if(p.has('periodo')) $('#periodo').value = p.get('periodo');
 }
+
 function exportCSV(){
   const rows=[...document.querySelectorAll('#tbl tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent));
   const header=['Data','Histórico','Complemento','Entrada','Saída'];
@@ -139,6 +154,7 @@ function exportCSV(){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`livro-caixa-${($('#empresa').value||'todas').replace(/\s+/g,'_')}-${$('#periodo').value}.csv`; a.click();
 }
+
 function init(){
   $('#periodo').value = new Date().toISOString().slice(0,7);
   fromQS(); load().catch(console.error);
@@ -147,6 +163,7 @@ function init(){
   $('#busca').addEventListener('input', ()=>load().catch(console.error));
   $('#btn-export').addEventListener('click', exportCSV);
 }
+
 window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
