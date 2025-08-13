@@ -12,7 +12,10 @@
     :root{ --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2; --primary:#00d1ff; --accent:#ff2e88; --ok:#37d399; --warn:#fec84b; --danger:#f43f5e; --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45); }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background: radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%), radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%), var(--bg); color:var(--ink); }
+    body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:
+      radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+      radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
+      var(--bg); color:var(--ink); }
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
     .title{font-size:28px;font-weight:700;letter-spacing:.3px}
@@ -83,7 +86,7 @@
     <section class="grid">
       <div class="card" id="card-periodo">
         <h3>Período</h3>
-        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill">Abrir Pop‑up</span></div>
+        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill">Abrir Pop-up</span></div>
       </div>
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
       <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
@@ -99,42 +102,146 @@
   </div>
 
 <script>
-/* ====== CONFIG ====== */
-const CONFIG = { POPUP_URL:'popup.html' };
+/* ====== CONFIG (DADO REAL) ====== */
+const CONFIG = {
+  POPUP_URL: 'popup.html',
+  API_URL: 'https://script.google.com/macros/s/AKfycbzqg8GEPFmod6W1xPxneXHAC6LRmnNAastew3QJtMpsf8mWwRowcZKZoNgRQskBM0-p/exec'
+};
 const $ = s => document.querySelector(s);
 
-/* ====== CHARTS DEMO ====== */
-function makeLine(ctx){ return new Chart(ctx,{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}); }
-function makeBar(ctx){ return new Chart(ctx,{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}}}}); }
+/* ====== HELPERS ====== */
+const fmtBR = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
+function toNumber(v){
+  if(v==null) return 0;
+  if(typeof v === 'number') return v;
+  return Number(String(v).replace(/[^0-9,-]/g,'').replace(/\./g,'').replace(',', '.')) || 0;
+}
+function buildUrl(base, params){
+  const u = new URL(base);
+  Object.entries(params||{}).forEach(([k,v])=>{
+    if(v!=null && v!=='') u.searchParams.set(k,v);
+  });
+  return u.toString();
+}
 
-/* ====== POP‑UP SYNC ====== */
+/* ====== CHARTS ====== */
+let chartLine, chartBar;
+function makeLine(ctx){ return new Chart(ctx,{
+  type:'line',
+  data:{ labels:[], datasets:[
+    {label:'Entradas', data:[], tension:.35, borderWidth:2, pointRadius:0, borderColor:'#00d1ff'},
+    {label:'Saídas',   data:[], tension:.35, borderWidth:2, pointRadius:0, borderColor:'#ff2e88'}
+  ]},
+  options:{ plugins:{legend:{labels:{color:'#9aa3b8'}}},
+            scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}} }
+});}
+function makeBar(ctx){ return new Chart(ctx,{
+  type:'bar',
+  data:{ labels:[], datasets:[{label:'Movimentos', data:[], backgroundColor:'#00d1ff'}] },
+  options:{ plugins:{legend:{labels:{color:'#9aa3b8'}}},
+            scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}} }
+});}
+
+/* ====== POP-UP SYNC ====== */
 let popupWin = null;
 function currentFilters(){ return { company: $('#empresa').value, periodo: $('#periodo').value }; }
-function openPopup(){ const qs = new URLSearchParams(currentFilters()).toString(); const url = CONFIG.POPUP_URL+'?'+qs; popupWin = window.open(url,'popup_livro_caixa','width=1200,height=800,menubar=no,toolbar=no,location=no'); }
-function syncFiltersToPopup(){ if(popupWin && !popupWin.closed){ popupWin.postMessage({type:'livrocaixa-filters',payload:currentFilters()},'*'); } }
+function openPopup(e){
+  e && e.preventDefault && e.preventDefault();
+  const qs = new URLSearchParams(currentFilters()).toString();
+  const url = CONFIG.POPUP_URL + '?' + qs;
+  const w = window.open(url, 'popup_livro_caixa', 'width=1200,height=800,menubar=no,toolbar=no,location=no');
+  popupWin = w && !w.closed ? w : null;
+  if(!popupWin) window.location.href = url; // fallback se popup bloqueado
+}
+function syncFiltersToPopup(){
+  if(popupWin && !popupWin.closed){
+    popupWin.postMessage({ type:'livrocaixa-filters', payload: currentFilters() }, '*');
+  }
+}
+
+/* ====== DATA (API REAL) ====== */
+async function fetchMovements(empresa, periodo){
+  const url = buildUrl(CONFIG.API_URL, { action:'list', empresa, periodo });
+  const r = await fetch(url, { cache:'no-store' });
+  if(!r.ok) throw new Error('Falha ao carregar movimentos');
+  const data = await r.json();
+  return Array.isArray(data) ? data : (data.items || data.rows || []);
+}
+function summarize(rows){
+  let entradas = 0, saidas = 0;
+  const byDay = new Map();
+  for(const it of rows){
+    const d = (it.data || it.Data || '').slice(0,10);
+    const key = d.includes('/') ? d.split('/').reverse().join('-') : d;
+    const e = toNumber(it.entrada ?? it.Entrada);
+    const s = toNumber(it.saida   ?? it.Saida);
+    entradas += e; saidas += s;
+    if(!byDay.has(key)) byDay.set(key,{e:0,s:0});
+    byDay.get(key).e += e; byDay.get(key).s += s;
+  }
+  const labels = [...byDay.keys()].sort();
+  const serieE = labels.map(k=> byDay.get(k).e);
+  const serieS = labels.map(k=> byDay.get(k).s);
+  return { entradas, saidas, labels, serieE, serieS, saldo: entradas - saidas };
+}
+
+/* ====== LOAD (DADOS REAIS) ====== */
+async function loadIndex(){
+  const empresa = $('#empresa').value;
+  const periodo = $('#periodo').value;
+  try{
+    const rows = await fetchMovements(empresa, periodo);
+    const s = summarize(rows);
+
+    // Período (mostra mês) e saldo no módulo Financeiro
+    $('#kpi-competencia').textContent = periodo.split('-').reverse().join('/');
+    const elFin = document.getElementById('kpi-fin');
+    if(elFin) elFin.textContent = fmtBR.format(s.saldo);
+
+    // Gráficos reais
+    if(!chartLine) chartLine = makeLine(document.getElementById('line-timeline'));
+    if(!chartBar)  chartBar  = makeBar(document.getElementById('bar-days'));
+
+    chartLine.data.labels = s.labels.map(l=> l.split('-').reverse().join('/'));
+    chartLine.data.datasets[0].data = s.serieE;
+    chartLine.data.datasets[1].data = s.serieS;
+    chartLine.update();
+
+    chartBar.data.labels = chartLine.data.labels;
+    chartBar.data.datasets[0].data = s.serieE.map((v,i)=> v + (s.serieS[i]||0));
+    chartBar.update();
+
+    $('#last-update').textContent = new Date().toLocaleString('pt-BR');
+  }catch(err){
+    console.error(err);
+    const elFin = document.getElementById('kpi-fin');
+    if(elFin) elFin.textContent = '—';
+  }
+}
 
 /* ====== INIT ====== */
 function init(){
-  // mês padrão = atual
   const month = new Date().toISOString().slice(0,7);
   $('#periodo').value = month;
   $('#kpi-competencia').textContent = month.split('-').reverse().join('/');
-  $('#last-update').textContent = new Date().toLocaleString('pt-BR');
 
-  makeLine(document.getElementById('line-timeline'));
-  makeBar(document.getElementById('bar-days'));
+  chartLine = makeLine(document.getElementById('line-timeline'));
+  chartBar  = makeBar(document.getElementById('bar-days'));
 
-  // sincronização
-  $('#empresa').addEventListener('change', ()=>{ syncFiltersToPopup(); });
-  $('#periodo').addEventListener('change', ()=>{ $('#kpi-competencia').textContent = $('#periodo').value.split('-').reverse().join('/'); syncFiltersToPopup(); });
-  document.getElementById('btn-refresh').addEventListener('click', ()=>{ syncFiltersToPopup(); });
-
-  // abrir popup ao clicar no card Período
   document.getElementById('card-periodo').addEventListener('click', openPopup);
-  window.addEventListener('focus', syncFiltersToPopup);
+  document.getElementById('btn-refresh').addEventListener('click', ()=>{ loadIndex(); syncFiltersToPopup(); });
+
+  document.getElementById('empresa').addEventListener('change', ()=>{ loadIndex(); syncFiltersToPopup(); });
+  document.getElementById('periodo').addEventListener('change', ()=>{ 
+    $('#kpi-competencia').textContent = $('#periodo').value.split('-').reverse().join('/'); 
+    loadIndex(); 
+    syncFiltersToPopup(); 
+  });
+
+  loadIndex(); // primeira carga REAL
 }
 
-window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); }catch(e){ console.error(e); } });
+window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); }catch(e){ console.error('Init error', e); } });
 </script>
 </body>
 </html>
