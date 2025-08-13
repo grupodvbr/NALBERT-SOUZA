@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    :root{--bg:#0a0a0a;--panel:#111111;--soft:#161616;--ink:#f5f7ff;--muted:#a9b0c2;--ring1:#00d1ff;--ring2:#ff2e88;--primary:#00d1ff;--accent:#ff2e88;--ok:#37d399;--warn:#fec84b;--danger:#f43f5e;--card-radius:18px;--shadow:0 10px 40px rgba(0,0,0,.45)}
+    :root{--bg:#0a0a0a;--panel:#111111;--soft:#161616;--ink:#f5f7ff;--muted:#a9b0c2;--primary:#00d1ff;--accent:#ff2e88;--ok:#37d399;--warn:#fec84b;--danger:#f43f5e;--card-radius:18px;--shadow:0 10px 40px rgba(0,0,0,.45)}
     *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
       radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
@@ -17,26 +17,24 @@
       var(--bg);color:var(--ink)}
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-    .title{font-size:28px;font-weight:700;letter-spacing:.3px}
+    .title{font-size:28px;font-weight:700}
     .subtitle{color:var(--muted);font-size:14px}
     .controls{display:flex;gap:12px;align-items:center}
     .btn,select{background:var(--panel);border:1px solid #1f1f1f;color:var(--ink);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow)}
     .btn:hover{filter:brightness(1.08)} select{appearance:none}
     .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
-    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .2s ease, filter .2s ease}
-    .mod:hover{transform:translateY(-2px);filter:brightness(1.02)}
+    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+    .mod:hover{transform:translateY(-2px)}
     .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
     .mod .desc{color:var(--muted);font-size:12px}
     .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
     .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
     .spark{width:100%;height:54px;margin-top:10px}
-    .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
+    .badge{position:absolute;top:12px;right:12px;background:#161616;border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
     .chip{display:inline-flex;align-items:center;gap:6px;background:#0f0f0f;border:1px solid #1e1e1e;padding:6px 10px;border-radius:999px;font-size:12px}
     .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-    .card-click{cursor:pointer;transition:transform .15s ease}
-    .card-click:hover{transform:translateY(-2px)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative}
     .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
     .kpi-line{display:flex;align-items:center;justify-content:space-between}
     .kpi-value{font-size:28px;font-weight:700;min-height:34px}
@@ -45,28 +43,22 @@
     .chart-card{padding:18px} canvas{width:100%;height:100%}
     .spinner{width:16px;height:16px;border:2px solid #2a2a2a;border-top-color:var(--primary);border-radius:50%;display:inline-block;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(1px)}
+    .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35)}
     .overlay.show{display:grid}
-    .toast{position:fixed;right:18px;bottom:18px;background:#111;border:1px solid #2a2a2a;color:var(--ink);padding:10px 12px;border-radius:12px;box-shadow:var(--shadow);display:none;max-width:min(90vw,460px);z-index:9999}
+    .toast{position:fixed;right:18px;bottom:18px;background:#111;border:1px solid #2a2a2a;color:var(--ink);padding:10px 12px;border-radius:12px;box-shadow:var(--shadow);display:none;z-index:9999}
     .toast.show{display:block;animation:fadeIn .15s ease}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-    .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(4px);z-index:999}
-    .modal-backdrop.show{display:grid !important;animation:fadeIn .18s ease-out}
-    .modal{width:min(1100px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow);position:relative}
-    .modal header{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:rgba(17,17,17,.9);border-bottom:1px solid #1f1f1f}
-    .modal h2{margin:0;font-size:18px;letter-spacing:.2px}
-    .modal .close{appearance:none;border:1px solid #2a2a2a;background:#0f0f0f;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
+    .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:999}
+    .modal-backdrop.show{display:grid !important}
+    .modal{width:min(1100px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:22px;box-shadow:var(--shadow)}
+    .modal header{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(17,17,17,.9);border-bottom:1px solid #1f1f1f}
     .modal .content{padding:18px;position:relative}
     .modal .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-    .modal .filters select,.modal .filters input{background:var(--soft);border:1px solid #232323;color:var(--ink);padding:10px 12px;border-radius:12px}
-    .modal .kpis{display:grid;gap:14px;grid-template-columns:repeat(4,1fr);margin-top:12px}
+    .modal .filters select,.modal .filters input{background:#161616;border:1px solid #232323;color:var(--ink);padding:10px 12px;border-radius:12px}
+    .modal .kpis{display:grid;gap:14px;grid-template-columns:repeat(4,1fr)}
     .modal .kpis .k{background:#0f0f0f;border:1px solid #1f1f1f;border-radius:14px;padding:12px 14px}
     .modal .k .label{color:#aab2c7;font-size:12px}
     .modal .k .val{font-size:22px;font-weight:800;margin-top:4px;min-height:28px}
-    .modal .charts{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:12px}
-    .modal .chart-card{background:#0f0f0f;border:1px solid #1f1f1f;border-radius:14px;padding:14px 14px 10px}
-    .modal footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid #1f1f1f;background:rgba(17,17,17,.9);position:sticky;bottom:0}
-    .modal .btn-primary{background:var(--primary);color:#0a0a0a;border:0;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
     table{width:100%;border-collapse:collapse;margin-top:12px}
     th,td{padding:8px 10px;border-bottom:1px solid #1f1f1f;font-size:13px}
     th{color:#aab2c7;text-align:left} td.num{text-align:right}
@@ -84,9 +76,9 @@
       </div>
       <div class="controls">
         <select id="empresa">
-          <option value="TODAS">Todas as empresas</option>
+          <option value="TODAS" selected>Todas as empresas</option>
           <option>MERCATTO DELICIA</option>
-          <option selected>DELICIA GOURMET</option>
+          <option>DELICIA GOURMET</option>
           <option>PADARIA DELICIA</option>
           <option>VILLA GOURMET</option>
           <option>M. KIDS</option>
@@ -96,19 +88,19 @@
       </div>
     </header>
 
-    <!-- Módulos (mesmo layout; KPIs de exemplo) -->
+    <!-- Módulos do seu molde (mantidos) -->
     <section class="modules">
-      <a class="mod" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi">—</div><canvas class="spark" id="sp1"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
-      <a class="mod" href="#"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi">—</div><canvas class="spark" id="sp2"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
-      <a class="mod" href="#"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi">—</div><canvas class="spark" id="sp3"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
-      <a class="mod" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi">—</div><canvas class="spark" id="sp4"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
-      <a class="mod" href="#"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi">—</div><canvas class="spark" id="sp5"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
-      <a class="mod" href="#"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi">—</div><canvas class="spark" id="sp6"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
-      <a class="mod" href="#"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi">—</div><canvas class="spark" id="sp7"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
-      <a class="mod" href="#"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi">—</div><canvas class="spark" id="sp8"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
+      <a class="mod"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="m1">—</div><canvas class="spark" id="sp1"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
+      <a class="mod"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="m2">—</div><canvas class="spark" id="sp2"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
+      <a class="mod"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="m3">—</div><canvas class="spark" id="sp3"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
+      <a class="mod"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="m4">—</div><canvas class="spark" id="sp4"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
+      <a class="mod"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi" id="m5">—</div><canvas class="spark" id="sp5"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
+      <a class="mod"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi" id="m6">—</div><canvas class="spark" id="sp6"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
+      <a class="mod"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi" id="m7">—</div><canvas class="spark" id="sp7"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
+      <a class="mod"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi" id="m8">—</div><canvas class="spark" id="sp8"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
     </section>
 
-    <!-- Card SALDO NA LOJA (mês) -->
+    <!-- Card Saldo na Loja -->
     <section class="grid" style="margin-top:22px">
       <div class="card card-click" id="card-saldo">
         <div class="overlay" id="card-loader"><div><span class="spinner"></span> Carregando…</div></div>
@@ -119,7 +111,6 @@
         </div>
         <div class="subtitle" id="lbl-periodo" style="margin-top:6px;color:var(--muted);font-size:12px">—</div>
       </div>
-
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
       <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
     </section>
@@ -133,7 +124,7 @@
     <div class="subtitle" style="margin-top:16px">Última atualização: <span id="last-update">—</span></div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal Financeiro -->
   <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <header>
@@ -145,9 +136,9 @@
 
         <div class="filters">
           <select id="modal-empresa">
-            <option value="TODAS">Todas as empresas</option>
+            <option value="TODAS" selected>Todas as empresas</option>
             <option>MERCATTO DELICIA</option>
-            <option selected>DELICIA GOURMET</option>
+            <option>DELICIA GOURMET</option>
             <option>PADARIA DELICIA</option>
             <option>VILLA GOURMET</option>
             <option>M. KIDS</option>
@@ -180,16 +171,16 @@
 
 <script>
 /* ========= CONFIG ========= */
-// COLE A URL /exec do Apps Script:
 const CONFIG = {
   APIS: {
-    FINANCEIRO: 'https://script.google.com/macros/s/AKfycbzep8JTgidRjuD_0vMcYsz1tBFCytJjOGu4uBvqaA7PYGSfYr5YdIMujPtuPTR3Joh2pA/exec'
+    // COLE AQUI a URL /exec do seu Apps Script:
+    FINANCEIRO: 'https://script.google.com/macros/s/AKfycbxjHA_yE21w4EiT3Ko3gvwSX0D9FUdwhFlYsHjhcBgv42zvcA91PsLKxThfV2-k8ro1Cw/exec'
   }
 };
 const $ = s => document.querySelector(s);
 const fmtBRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 
-/* ========= helpers UI ========= */
+/* helpers UI */
 function spark(el,data){
   const ctx=document.getElementById(el);
   const g=ctx.getContext('2d').createLinearGradient(0,0,0,60);
@@ -199,37 +190,37 @@ function spark(el,data){
 function showToast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4000);}
 function showCardLoader(on){ $('#card-loader').classList.toggle('show',!!on); }
 function showModalLoader(on){ $('#modal-loader').classList.toggle('show',!!on); }
-function buildUrl(base,empresa,periodo){const u=new URL(base); if(empresa&&empresa!=='TODAS')u.searchParams.set('empresa',empresa); if(periodo)u.searchParams.set('periodo',periodo); return u.toString();}
-async function fetchJSON(url){const r=await fetch(url,{headers:{'cache-control':'no-cache'}}); const txt=await r.text(); try{return JSON.parse(txt);} catch(e){throw new Error('API não retornou JSON')}};
+function setBtnLoading(on){ const b=$('#btn-refresh'); if(on){ b.disabled=true; b.dataset.t=b.textContent; b.textContent='Carregando…'; } else { b.disabled=false; b.textContent=b.dataset.t||'Atualizar'; } }
+function buildUrl(base,empresa,periodo){ const u=new URL(base); if(empresa && empresa!=='TODAS') u.searchParams.set('empresa',empresa); if(periodo) u.searchParams.set('periodo',periodo); return u.toString(); }
+async function fetchJSON(url){ const r=await fetch(url,{headers:{'cache-control':'no-cache'}}); const t=await r.text(); try{ return JSON.parse(t); }catch{ throw new Error('API não retornou JSON'); } }
 
-/* ========= Charts decorativos ========= */
-let lineMain, barMain, modalLine, modalBar;
+/* charts de exemplo */
+let modalLine, modalBar;
 function bootCharts(){
-  lineMain = new Chart($('#line-timeline'),{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]}}); 
-  barMain  = new Chart($('#bar-days'),{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]}}); 
+  new Chart($('#line-timeline'),{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]}}); 
+  new Chart($('#bar-days'),{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]}}); 
 }
 
-/* ========= FINANCEIRO (lê E4) ========= */
+/* FINANCEIRO (E4) */
 async function loadSaldoCard(){
   const empresa = $('#empresa').value;
   const periodo = $('#periodo').value;
   $('#lbl-periodo').textContent = `Período: ${periodo.split('-').reverse().join('/')}`;
-
-  showCardLoader(true);
+  showCardLoader(true); setBtnLoading(true);
   try{
     const data = await fetchJSON(buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo));
     if(!data.ok) throw new Error(data.error||'Falha no Apps Script');
-    $('#kpi-saldo').textContent = fmtBRL.format(data.saldoLoja||0); // valor da E4
+    $('#kpi-saldo').textContent = fmtBRL.format(data.saldoLoja||0);
     window.__CACHE__ = {empresa, periodo, data};
   }catch(err){
-    showToast('Erro ao carregar saldo: '+err.message);
     $('#kpi-saldo').textContent = '—';
+    showToast('Erro ao carregar saldo: '+err.message);
   }finally{
-    showCardLoader(false);
+    showCardLoader(false); setBtnLoading(false);
   }
 }
 
-/* ========= MODAL ========= */
+/* MODAL */
 function openModal(){
   $('#modal-empresa').value = $('#empresa').value;
   $('#modal-periodo').value = $('#periodo').value;
@@ -244,10 +235,12 @@ function closeModal(){
 async function refreshModal(){
   const empresa = $('#modal-empresa').value;
   const periodo = $('#modal-periodo').value;
+
   if(!modalLine){
     modalLine = new Chart($('#modal-line'),{type:'line',data:{labels:[],datasets:[{label:'Saldo diário',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'}]}});
-    modalBar  = new Chart($('#modal-bar'), {type:'bar', data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
+    modalBar  = new Chart($('#modal-bar') ,{type:'bar' ,data:{labels:[],datasets:[{label:'Movimentos',data:[],backgroundColor:'#ff2e88'}]}});
   }
+
   showModalLoader(true);
   try{
     const data = await fetchJSON(buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo));
@@ -256,7 +249,7 @@ async function refreshModal(){
     $('#kpi-a').textContent = fmtBRL.format(data.totais?.entradas||0);
     $('#kpi-b').textContent = fmtBRL.format(data.totais?.saidas||0);
     $('#kpi-c').textContent = fmtBRL.format((data.totais?.entradas||0)-(data.totais?.saidas||0));
-    $('#kpi-d').textContent = fmtBRL.format(data.saldoLoja||0); // E4
+    $('#kpi-d').textContent = fmtBRL.format(data.saldoLoja||0);
 
     const tb = $('#livro-tabela tbody'); tb.innerHTML='';
     (data.lancamentos||[]).forEach(l=>{
@@ -272,6 +265,7 @@ async function refreshModal(){
     const movs   = (data.serie||[]).map(d=>d.movimentos);
     modalLine.data.labels = labels; modalLine.data.datasets[0].data = saldo; modalLine.update();
     modalBar.data.labels  = labels; modalBar.data.datasets[0].data  = movs;  modalBar.update();
+
   }catch(err){
     showToast('Erro ao carregar detalhes: '+err.message);
   }finally{
@@ -279,34 +273,29 @@ async function refreshModal(){
   }
 }
 
-/* ========= BOOT ========= */
+/* BOOT */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // mês atual
+  // mês atual (YYYY-MM)
   $('#periodo').value = new Date().toISOString().slice(0,7);
+  $('#modal-periodo').value = $('#periodo').value;
   $('#last-update').textContent = new Date().toLocaleString('pt-BR');
 
-  // sparks dummy
-  spark('sp1',Array.from({length:12},()=>100+Math.random()*300));
-  spark('sp2',Array.from({length:12},()=>100+Math.random()*300));
-  spark('sp3',Array.from({length:12},()=>100+Math.random()*300));
-  spark('sp4',Array.from({length:12},()=>100+Math.random()*300));
-  spark('sp5',Array.from({length:12},()=>100+Math.random()*300));
-  spark('sp6',Array.from({length:12},()=>100+Math.random()*300));
-  spark('sp7',Array.from({length:12},()=>100+Math.random()*300));
-  spark('sp8',Array.from({length:12},()=>100+Math.random()*300));
+  // mini-sparks decorativos
+  ['sp1','sp2','sp3','sp4','sp5','sp6','sp7','sp8'].forEach(id=>{
+    spark(id, Array.from({length:12},()=>100+Math.random()*300));
+  });
 
   bootCharts();
   loadSaldoCard();
 
-  // eventos
   $('#btn-refresh').addEventListener('click', loadSaldoCard);
   $('#empresa').addEventListener('change', loadSaldoCard);
   $('#periodo').addEventListener('change', loadSaldoCard);
 
   $('#card-saldo').addEventListener('click', openModal);
   $('#modal-close').addEventListener('click', closeModal);
-  $('#modal-backdrop').addEventListener('click', (e)=>{ if(e.target.id==='modal-backdrop') closeModal(); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+  $('#modal-backdrop').addEventListener('click', e=>{ if(e.target.id==='modal-backdrop') closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 
   $('#modal-empresa').addEventListener('change', refreshModal);
   $('#modal-periodo').addEventListener('change', refreshModal);
