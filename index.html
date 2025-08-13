@@ -48,16 +48,13 @@
     .spinner{width:16px;height:16px;border:2px solid #2a2a2a;border-top-color:var(--primary);border-radius:50%;display:inline-block;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .loading{color:var(--muted)}
-    .overlay{
-      position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(1px)
-    }
+    .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(1px)}
     .overlay.show{display:grid}
     .toast{
       position:fixed;right:18px;bottom:18px;background:#111;border:1px solid #2a2a2a;color:var(--ink);
       padding:10px 12px;border-radius:12px;box-shadow:var(--shadow);display:none;max-width:min(90vw,460px);z-index:9999
     }
     .toast.show{display:block;animation:fadeIn .15s ease}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
     /* Modal */
     .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(4px);z-index:999}
@@ -126,6 +123,7 @@
           <span class="pill" id="pill-detalhar">Detalhar</span>
         </div>
         <div class="subtitle" id="lbl-periodo" style="margin-top:6px;color:var(--muted);font-size:12px">—</div>
+        <div class="subtitle" id="debug-msg" style="margin-top:6px;color:#fca5a5;font-size:12px"></div>
       </div>
 
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
@@ -195,14 +193,14 @@ const CONFIG = {
     FINANCEIRO:'resumo-financeiro/index.html', DELIVERY:'delivery/index.html',
     CONCILIACAO:'conciliacao/index.html', PESQUISA:'pesquisa/index.html', MIDIAS:'midias/index.html'
   },
-  // COLE AQUI a URL do seu Web App (termina com /exec)
+  // TROQUE pela SUA URL /exec do Web App:
   APIS: { FINANCEIRO:'https://script.google.com/macros/s/AKfycbyeMeRro6kTB3izlDyaQFvCA50k85IwWBKZoq1qYOI1-BxIPAo5IviXLnNpLl4UfAIhGQ/exec' }
 };
 const $ = s => document.querySelector(s);
 const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 
 /* ========= HELPERS (UI) ========= */
-function showToast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 4000); }
+function showToast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 5000); }
 function setBtnLoading(btn, on, label='Atualizar'){
   if(on){ btn.disabled=true; btn.dataset.prev=btn.textContent; btn.textContent='Carregando…'; btn.setAttribute('aria-busy','true'); }
   else { btn.disabled=false; btn.textContent=btn.dataset.prev || label; btn.removeAttribute('aria-busy'); }
@@ -210,7 +208,7 @@ function setBtnLoading(btn, on, label='Atualizar'){
 function showCardLoader(on){ $('#card-loader').classList.toggle('show', !!on); }
 function showModalLoader(on){ $('#modal-loader').classList.toggle('show', !!on); }
 
-/* ========= FETCH ========= */
+/* ========= FETCH com diagnóstico ========= */
 function buildUrl(base, empresa, periodo){
   if(!base) return '';
   const u = new URL(base);
@@ -220,9 +218,15 @@ function buildUrl(base, empresa, periodo){
 }
 async function fetchJSON(url){
   const r = await fetch(url, { headers:{'cache-control':'no-cache'} });
-  const text = await r.text();
-  try { return JSON.parse(text); }
-  catch(e){ console.error('Resposta não é JSON', {status:r.status, body:text.slice(0,500)}); throw new Error('A API não retornou JSON'); }
+  const body = await r.text();
+
+  // Diagnóstico: se não for JSON, mostre trecho
+  const ct = (r.headers.get('content-type')||'').toLowerCase();
+  if(!ct.includes('application/json')){
+    throw new Error(`Resposta não-JSON (status ${r.status}). Trecho: ${body.slice(0,180).replace(/\s+/g,' ')}`);
+  }
+  try{ return JSON.parse(body); }
+  catch(e){ throw new Error('Falha ao interpretar JSON: '+e.message); }
 }
 
 /* ========= ADAPTER ========= */
@@ -230,7 +234,7 @@ async function getFinanceiro(empresa,periodo){
   if(!CONFIG.APIS.FINANCEIRO) throw new Error('API não configurada');
   const url = buildUrl(CONFIG.APIS.FINANCEIRO, empresa, periodo);
   const data = await fetchJSON(url);
-  if(data && data.ok === false) throw new Error(data.error||'Falha no Apps Script');
+  if(data && data.ok === false) throw new Error(data.error||'Apps Script retornou erro');
   return {
     saldoLoja: Number(data.saldoLoja||0),
     entradas: Number(data.totais?.entradas||0),
@@ -258,9 +262,11 @@ async function loadFinanceiroToCard(){
   const per = $('#periodo').value;
   const btn = $('#btn-refresh');
 
+  $('#debug-msg').textContent = '';
   showCardLoader(true);
   setBtnLoading(btn, true);
 
+  const url = buildUrl(CONFIG.APIS.FINANCEIRO, emp, per);
   try{
     const fin = await getFinanceiro(emp, per);
     $('#kpi-competencia').textContent = fmt.format(fin.saldoLoja||0);
@@ -270,7 +276,8 @@ async function loadFinanceiroToCard(){
     console.error('Erro FINANCEIRO:', err);
     $('#kpi-competencia').textContent = '—';
     $('#lbl-periodo').textContent = 'Falha ao carregar';
-    showToast('Erro ao carregar resumo financeiro: ' + (err.message||err));
+    $('#debug-msg').innerHTML = `Erro: ${err.message}. <a href="${url}" target="_blank" rel="noopener">Testar API</a>`;
+    showToast('Erro ao carregar resumo financeiro. Veja o link "Testar API".');
   }finally{
     showCardLoader(false);
     setBtnLoading(btn, false);
@@ -353,7 +360,7 @@ async function refreshModal(){
 
 /* ========= BOOT ========= */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // MÊS ATUAL como padrão
+  // MÊS ATUAL como padrão (yyyy-MM)
   $('#periodo').value = new Date().toISOString().slice(0,7);
   $('#lbl-periodo').textContent = `Período: ${$('#periodo').value.split('-').reverse().join('/')}`;
   $('#last-update').textContent = new Date().toLocaleString('pt-BR');
