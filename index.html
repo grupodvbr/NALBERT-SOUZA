@@ -3,27 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Unificado TESTE</title>
+  <title>Dashboard Unificado</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    :root{
-      --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2;
-      --primary:#00d1ff; --accent:#ff2e88; --ok:#37d399; --warn:#fec84b; --danger:#f43f5e;
-      --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45);
-    }
+    :root{ --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2; --primary:#00d1ff; --accent:#ff2e88; --ok:#37d399; --warn:#fec84b; --danger:#f43f5e; --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45); }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background:
-        radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
-        radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
-        var(--bg);
-      color:var(--ink);
-    }
+    body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background: radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%), radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%), var(--bg); color:var(--ink); }
     .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
     .title{font-size:28px;font-weight:700;letter-spacing:.3px}
@@ -46,12 +35,11 @@
     .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
 
     .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer}
     .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
     .kpi-line{display:flex;align-items:center;justify-content:space-between}
     .kpi-value{font-size:28px;font-weight:700}
     .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
-    .pill-btn{cursor:pointer; user-select:none}
 
     .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
     .chart-card{padding:18px}
@@ -93,12 +81,9 @@
 
     <!-- KPIs gerais -->
     <section class="grid">
-      <div class="card" id="card-periodo" role="button" tabindex="0" aria-label="Abrir pop-up do período">
+      <div class="card" id="card-periodo">
         <h3>Período</h3>
-        <div class="kpi-line">
-          <div class="kpi-value" id="kpi-competencia">—</div>
-          <span class="pill pill-btn" id="btn-open-popup">Abrir Pop‑up</span>
-        </div>
+        <div class="kpi-line"><div class="kpi-value" id="kpi-competencia">—</div><span class="pill">Abrir Pop‑up</span></div>
       </div>
       <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
       <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
@@ -115,29 +100,18 @@
 
 <script>
 /* ====== CONFIG ====== */
-const CONFIG = { POPUP_URL: 'popup.html' };
+const CONFIG = { POPUP_URL:'popup.html' };
 const $ = s => document.querySelector(s);
 
-/* ====== DEMO CHARTS ====== */
+/* ====== CHARTS DEMO ====== */
 function makeLine(ctx){ return new Chart(ctx,{type:'line',data:{labels:['S1','S2','S3','S4','S5','S6','S7'],datasets:[{label:'Likes',data:[180,220,260,300,450,200,150],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},{label:'Novos seguidores',data:[60,120,180,250,380,150,90],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}); }
 function makeBar(ctx){ return new Chart(ctx,{type:'bar',data:{labels:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],datasets:[{label:'Eventos',data:[16,8,11,16,9,8,7],backgroundColor:'#00d1ff'}]},options:{plugins:{legend:{labels:{color:'#9aa3b8'}}},scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}}}}); }
 
-/* ====== POP-UP SYNC ====== */
+/* ====== POP‑UP SYNC ====== */
 let popupWin = null;
 function currentFilters(){ return { company: $('#empresa').value, periodo: $('#periodo').value }; }
-function openPopup(evt){
-  evt && evt.preventDefault && evt.preventDefault();
-  const qs = new URLSearchParams(currentFilters()).toString();
-  const url = CONFIG.POPUP_URL + '?' + qs;
-  const w = window.open(url, 'popup_livro_caixa', 'width=1200,height=800,menubar=no,toolbar=no,location=no');
-  if(!w || w.closed){
-    // fallback (navega na mesma aba se o navegador bloquear pop-up)
-    window.location.href = url;
-  } else {
-    popupWin = w;
-  }
-}
-function syncFiltersToPopup(){ if(popupWin && !popupWin.closed){ popupWin.postMessage({ type:'livrocaixa-filters', payload: currentFilters() }, '*'); } }
+function openPopup(){ const qs = new URLSearchParams(currentFilters()).toString(); const url = CONFIG.POPUP_URL+'?'+qs; popupWin = window.open(url,'popup_livro_caixa','width=1200,height=800,menubar=no,toolbar=no,location=no'); }
+function syncFiltersToPopup(){ if(popupWin && !popupWin.closed){ popupWin.postMessage({type:'livrocaixa-filters',payload:currentFilters()},'*'); } }
 
 /* ====== INIT ====== */
 function init(){
@@ -145,31 +119,22 @@ function init(){
   const month = new Date().toISOString().slice(0,7);
   $('#periodo').value = month;
   $('#kpi-competencia').textContent = month.split('-').reverse().join('/');
-  document.getElementById('last-update').textContent = new Date().toLocaleString('pt-BR');
+  $('#last-update').textContent = new Date().toLocaleString('pt-BR');
 
   makeLine(document.getElementById('line-timeline'));
   makeBar(document.getElementById('bar-days'));
 
-  // abrir pop-up
-  document.getElementById('btn-open-popup').addEventListener('click', openPopup);
-  document.getElementById('card-periodo').addEventListener('click', (e)=>{
-    // evita duplo clique quando o alvo é o botão
-    if(e.target && e.target.id === 'btn-open-popup') return;
-    openPopup(e);
-  });
-  document.getElementById('card-periodo').addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ openPopup(e); }});
+  // sincronização
+  $('#empresa').addEventListener('change', ()=>{ syncFiltersToPopup(); });
+  $('#periodo').addEventListener('change', ()=>{ $('#kpi-competencia').textContent = $('#periodo').value.split('-').reverse().join('/'); syncFiltersToPopup(); });
+  document.getElementById('btn-refresh').addEventListener('click', ()=>{ syncFiltersToPopup(); });
 
-  // sincronização quando filtros mudam
-  document.getElementById('empresa').addEventListener('change', syncFiltersToPopup);
-  document.getElementById('periodo').addEventListener('change', ()=>{
-    document.getElementById('kpi-competencia').textContent = document.getElementById('periodo').value.split('-').reverse().join('/');
-    syncFiltersToPopup();
-  });
-  document.getElementById('btn-refresh').addEventListener('click', syncFiltersToPopup);
+  // abrir popup ao clicar no card Período
+  document.getElementById('card-periodo').addEventListener('click', openPopup);
   window.addEventListener('focus', syncFiltersToPopup);
 }
 
-window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); }catch(e){ console.error('Init error', e); } });
+window.addEventListener('DOMContentLoaded', ()=>{ try{ init(); }catch(e){ console.error(e); } });
 </script>
 </body>
 </html>
