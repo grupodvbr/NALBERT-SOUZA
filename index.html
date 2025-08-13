@@ -63,13 +63,10 @@
     /* ===== Card Metas — UI bonita e compacta ===== */
     #kpi-metas{font-size:13px;line-height:1.35;font-weight:600}
     #kpi-metas .meta-head{font-size:12px;color:var(--muted);margin-bottom:6px}
-
-
-    .meta-list {
-  overflow: visible;
-  max-height: none;
-}
-    
+    .meta-list{
+      margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;
+      max-height:190px; overflow:auto; scrollbar-width:thin;
+    }
    .meta-item {
   background: var(--panel); /* volta para o fundo escuro original */
   border: 1px solid #1f1f1f;
