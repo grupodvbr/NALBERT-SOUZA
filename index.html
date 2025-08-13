@@ -1,241 +1,298 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Livro de Caixa — Pop‑up</title>
+  <title>Dashboard Unificado • Dark</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    :root{--bg:#0a0a0a;--panel:#111;--muted:#161616;--ink:#f6f7fb;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;}
+    :root{
+      --bg:#0a0a0a; --panel:#111111; --soft:#161616; --ink:#f5f7ff; --muted:#a9b0c2;
+      --ring1:#00d1ff; --ring2:#ff2e88; --primary:#00d1ff; --accent:#ff2e88;
+      --ok:#37d399; --warn:#fec84b; --danger:#f43f5e; --card-radius:18px; --shadow:0 10px 40px rgba(0,0,0,.45);
+    }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,Segoe UI,Arial}
-    header{padding:16px 18px;border-bottom:1px solid #1f1f1f;display:flex;justify-content:space-between;align-items:center}
-    h1{font-size:16px;margin:0}
-    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid #2a2a2a;background:#0e0e0e;padding:6px 10px;border-radius:999px;font-size:12px}
-    .wrap{max-width:1180px;margin:0 auto;padding:18px}
-    .panel{background:var(--panel);border:1px solid #1d1d1d;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .row{display:grid;gap:12px}
-    .row.cols-4{grid-template-columns:repeat(4,1fr)}
-    .card{background:var(--muted);border:1px solid #222;border-radius:14px;padding:14px}
-    .kpi .label{opacity:.85;font-size:12px}
-    .kpi .value{font-size:22px;font-weight:700;margin-top:6px}
-    .kpi.ok .value{color:var(--ok)}
-    .kpi.bad .value{color:var(--bad)}
-    .kpi.warn .value{color:var(--warn)}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #222}
-    th{position:sticky;top:0;background:#151515;text-align:left}
-    .right{text-align:right}
-    .hint{opacity:.7}
-    .empty{opacity:.6;text-align:center;padding:24px}
-    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-    select,input{background:#0e0e0e;border:1px solid #222;color:var(--ink);border-radius:10px;padding:8px 10px}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(1100px 720px at 65% -10%, rgba(0,209,255,.12), transparent 60%),
+        radial-gradient(900px 540px at -10% 15%, rgba(255,46,136,.10), transparent 55%),
+        var(--bg);
+      color:var(--ink);
+    }
+    .wrap{max-width:1500px;margin:32px auto;padding:0 24px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+    .title{font-size:28px;font-weight:700;letter-spacing:.3px}
+    .subtitle{color:var(--muted);font-size:14px}
+    .controls{display:flex;gap:12px;align-items:center}
+    .btn, select{background:var(--panel);border:1px solid #1f1f1f;color:var(--ink);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow)}
+    .btn:hover{filter:brightness(1.08)}
+    select{appearance:none}
+
+    .modules{display:grid;gap:18px;grid-template-columns:repeat(4,1fr)}
+    .mod{position:relative;display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),var(--panel);border:1px solid #1e1e1e;border-radius:var(--card-radius);padding:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .2s ease, filter .2s ease}
+    .mod:hover{transform:translateY(-2px);filter:brightness(1.02)}
+    .mod h4{margin:0 0 6px;font-size:16px;font-weight:700}
+    .mod .desc{color:var(--muted);font-size:12px}
+    .mod .kpi{font-size:26px;font-weight:800;margin-top:10px}
+    .mod .foot{color:var(--muted);font-size:12px;margin-top:6px}
+    .spark{width:100%;height:54px;margin-top:10px}
+    .badge{position:absolute;top:12px;right:12px;background:var(--soft);border:1px solid #222;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip{display:inline-flex;align-items:center;gap:6px;background:#0f0f0f;border:1px solid #1e1e1e;padding:6px 10px;border-radius:999px;font-size:12px}
+    .chip i{width:8px;height:8px;border-radius:999px;background:var(--primary)}
+
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr);margin-top:22px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--panel);border:1px solid #1c1c1c;border-radius:var(--card-radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--muted)}
+    .kpi-line{display:flex;align-items:center;justify-content:space-between}
+    .kpi-value{font-size:28px;font-weight:700}
+    .pill{font-size:12px;color:#0a0a0a;background:var(--primary);padding:4px 8px;border-radius:999px;font-weight:700}
+
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
+    .chart-card{padding:18px}
+    canvas{width:100%;height:100%}
+
+    @media (max-width:1280px){.modules{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <header>
-    <h1 id="ttl">Livro de Caixa — Pop‑up</h1>
-    <span class="pill"><span class="hint">Atualizado:</span> <span id="updated">—</span></span>
-  </header>
-
   <div class="wrap">
-    <div class="panel">
-      <!-- Filtros locais (recebem valores do index, mas também podem ser usados no pop-up) -->
-      <div class="filters">
-        <label>
-          <span class="hint">Empresa</span><br>
-          <select id="empresa"></select>
-        </label>
-        <label>
-          <span class="hint">Data inicial</span><br>
-          <input type="date" id="dtIni">
-        </label>
-        <label>
-          <span class="hint">Data final</span><br>
-          <input type="date" id="dtFim">
-        </label>
-        <label style="flex:1 1 260px">
-          <span class="hint">Buscar</span><br>
-          <input type="text" id="busca" placeholder="histórico ou complemento">
-        </label>
+    <header>
+      <div>
+        <div class="title">Dashboard Unificado</div>
+        <div class="subtitle">Versão Desktop • Paleta do print preto (ciano/rosa)</div>
       </div>
-
-      <div class="row cols-4" style="margin-top:12px">
-        <div class="card kpi" id="kpi-saldo-impl">
-          <div class="label">Saldo na implantação</div>
-          <div class="value">—</div>
-        </div>
-        <div class="card kpi" id="kpi-entradas">
-          <div class="label">Total de Entradas</div>
-          <div class="value">—</div>
-        </div>
-        <div class="card kpi" id="kpi-saidas">
-          <div class="label">Total de Saídas</div>
-          <div class="value">—</div>
-        </div>
-        <div class="card kpi" id="kpi-saldo">
-          <div class="label">Saldo no Período</div>
-          <div class="value">—</div>
-        </div>
+      <div class="controls">
+        <select id="empresa">
+          <option value="TODAS">Todas as empresas</option>
+          <option>MERCATTO DELICIA</option>
+          <option>DELICIA GOURMET</option>
+          <option>PADARIA DELICIA</option>
+          <option>VILLA GOURMET</option>
+          <option>M. KIDS</option>
+        </select>
+        <input type="month" id="periodo" class="btn" />
+        <button class="btn" id="btn-refresh">Atualizar</button>
+        <button class="btn" id="btn-popup">Abrir Pop‑up</button>
       </div>
+    </header>
 
-      <div class="card" style="margin-top:12px">
-        <div style="overflow:auto;max-height:66vh">
-          <table id="tbl">
-            <thead>
-              <tr>
-                <th style="width:120px">Data</th>
-                <th>Histórico</th>
-                <th>Complemento</th>
-                <th class="right" style="width:120px">Entrada</th>
-                <th class="right" style="width:120px">Saída</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div class="empty" id="empty" hidden>Nenhum lançamento no período.</div>
-        </div>
-      </div>
+    <!-- Módulos -->
+    <section class="modules">
+      <a class="mod" data-mod="METAS" id="link-metas" href="#"><span class="badge">Metas</span><h4>Metas</h4><div class="desc">Faturamento vs. objetivo</div><div class="kpi" id="kpi-metas">—</div><canvas id="spark-metas" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Progresso</span></div></a>
+      <a class="mod" data-mod="CANCELAMENTOS" id="link-cancel" href="#"><span class="badge">Cancelamentos</span><h4>Cancelamentos</h4><div class="desc">Itens/valor cancelado</div><div class="kpi" id="kpi-cancel">—</div><canvas id="spark-cancel" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--danger)"></i> Risco</span></div></a>
+      <a class="mod" data-mod="TRAVAS" id="link-travas" href="#"><span class="badge">Travas</span><h4>Travas de Compras</h4><div class="desc">Planos válidos e já comprado</div><div class="kpi" id="kpi-travas">—</div><canvas id="spark-travas" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--warn)"></i> Alerta</span></div></a>
+      <a class="mod" data-mod="FINANCEIRO" id="link-fin" href="#"><span class="badge">Financeiro</span><h4>Resumo Financeiro</h4><div class="desc">Entradas x Saídas</div><div class="kpi" id="kpi-fin">—</div><canvas id="spark-fin" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Saldo</span></div></a>
+      <a class="mod" data-mod="DELIVERY" id="link-delivery" href="#"><span class="badge">Delivery</span><h4>Vendas em Delivery</h4><div class="desc">Pedidos / ticket médio</div><div class="kpi" id="kpi-delivery">—</div><canvas id="spark-delivery" class="spark"></canvas><div class="foot"><span class="chip"><i></i> Crescimento</span></div></a>
+      <a class="mod" data-mod="CONCILIACAO" id="link-bank" href="#"><span class="badge">Bancária</span><h4>Conciliação Bancária</h4><div class="desc">Conferência de movimentos</div><div class="kpi" id="kpi-bank">—</div><canvas id="spark-bank" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Pendências</span></div></a>
+      <a class="mod" data-mod="PESQUISA" id="link-nps" href="#"><span class="badge">NPS</span><h4>Pesquisa de Satisfação</h4><div class="desc">NPS / avaliações</div><div class="kpi" id="kpi-nps">—</div><canvas id="spark-nps" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--ok)"></i> Pontuação</span></div></a>
+      <a class="mod" data-mod="MIDIAS" id="link-midias" href="#"><span class="badge">Mídias</span><h4>Mídias Sociais</h4><div class="desc">Views / engajamento</div><div class="kpi" id="kpi-views">—</div><canvas id="spark-views" class="spark"></canvas><div class="foot"><span class="chip"><i style="background:var(--accent)"></i> Engaj.</span></div></a>
+    </section>
 
-    </div>
+    <!-- KPIs gerais -->
+    <section class="grid">
+      <div class="card"><h3>Saldo em Caixa ("Saldo na loja")</h3><div class="kpi-line"><div class="kpi-value" id="kpi-saldo-caixa">—</div><span class="pill">Atual</span></div></div>
+      <div class="card"><h3>Máquinas Stone</h3><div class="kpi-line"><div class="kpi-value" id="kpi-func-ativos">—</div><span class="pill" style="background:var(--accent)">Ativos</span></div></div>
+      <div class="card"><h3>Requisições</h3><div class="kpi-line"><div class="kpi-value" id="kpi-credito">—</div><span class="pill" style="background:var(--ok)">Créditos</span></div></div>
+    </section>
+
+    <!-- CHARTS -->
+    <section class="charts">
+      <div class="card chart-card"><h3>Timeline geral</h3><canvas id="line-timeline" height="300"></canvas></div>
+      <div class="card chart-card"><h3>Dias mais ativos</h3><canvas id="bar-days" height="300"></canvas></div>
+    </section>
+
+    <div class="subtitle" style="margin-top:16px">Última atualização: <span id="last-update">—</span></div>
   </div>
 
-  <script>
-    // ====== CONFIGURE AQUI ======
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqg8GEPFmod6W1xPxneXHAC6LRmnNAastew3QJtMpsf8mWwRowcZKZoNgRQskBM0-p/exec?action=list";
-    // =============================
+<script>
+/* ========= CONFIG ========= */
+const CONFIG = {
+  LINKS: {
+    METAS: 'metas/index.html',
+    CANCELAMENTOS: 'cancelamentos/index.html',
+    TRAVAS: 'travas/index.html',
+    FINANCEIRO: 'resumo-financeiro/index.html',
+    DELIVERY: 'delivery/index.html',
+    CONCILIACAO: 'conciliacao/index.html',
+    PESQUISA: 'pesquisa/index.html',
+    MIDIAS: 'midias/index.html'
+  },
+  APIS: { METAS:'', CANCELAMENTOS:'', PESQUISA:'', TRAVAS:'', FINANCEIRO:'', DELIVERY:'', CONCILIACAO:'', MIDIAS:'' },
+  WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbzqg8GEPFmod6W1xPxneXHAC6LRmnNAastew3QJtMpsf8mWwRowcZKZoNgRQskBM0-p/exec?action=list',
+  POPUP_URL: 'popup.html' // arquivo do pop‑up (use o que criamos anteriormente)
+};
+const $ = s => document.querySelector(s);
+const fmtBRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 
-    const fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
-    let raw = null;       // payload completo do servidor
-    let current = null;   // empresa selecionada
+/* ========= CHART HELPERS ========= */
+function spark(el, data){
+  const ctx = document.getElementById(el);
+  const g = ctx.getContext('2d').createLinearGradient(0,0,0,60);
+  g.addColorStop(0, 'rgba(0,209,255,.35)'); g.addColorStop(1, 'rgba(255,46,136,.05)');
+  return new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i+1),datasets:[{data, borderWidth:2, pointRadius:0, tension:.35, fill:true, backgroundColor:g, borderColor:'#00d1ff'}]},options:{plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{x:{display:false},y:{display:false}},elements:{line:{borderJoinStyle:'round'}}});
+}
+function makeLine(ctx){
+  return new Chart(ctx,{type:'line',data:{labels:[],datasets:[
+    {label:'Likes',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#00d1ff'},
+    {label:'Novos seguidores',data:[],tension:.35,borderWidth:2,pointRadius:0,borderColor:'#ff2e88'}
+  ]},options:{scales:{x:{ticks:{color:'#8b93a7'}},y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}});
+}
+function makeBar(ctx){
+  return new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Eventos',data:[],backgroundColor:'#00d1ff'}]},options:{scales:{y:{grid:{color:'rgba(255,255,255,.06)'}}},plugins:{legend:{labels:{color:'#9aa3b8'}}}}});
+}
 
-    // Carrega dados do servidor
-    async function load() {
-      const res = await fetch(WEB_APP_URL,{cache:'no-store'});
-      const data = await res.json();
-      if (data.error) throw new Error(data.message || 'Falha ao carregar');
-      raw = data;
-      document.getElementById('updated').textContent = new Date(data.generatedAt).toLocaleString('pt-BR');
-      mountEmpresaOptions();
-      // Default: primeira empresa + mês atual
-      const first = raw.companies?.[0]?.company || '';
-      document.getElementById('empresa').value = first;
-      const now = new Date();
-      document.getElementById('dtIni').valueAsDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      document.getElementById('dtFim').valueAsDate = new Date(now.getFullYear(), now.getMonth()+1, 0);
-      render();
-    }
+/* ========= APPS SCRIPT – CARREGAR SALDO EM CAIXA ========= */
+let payloadCaixa = null; // cache do endpoint
+async function loadCaixa(){
+  if (payloadCaixa) return payloadCaixa;
+  const r = await fetch(CONFIG.WEB_APP_URL, {cache:'no-store'});
+  const j = await r.json();
+  if (j.error) throw new Error(j.message||'Falha no web app');
+  payloadCaixa = j; // {companies:[{company, saldoNaLoja, ...}]}
+  return j;
+}
+function computeSaldo(empresa){
+  if (!payloadCaixa?.companies?.length) return 0;
+  if (!empresa || empresa==='TODAS'){
+    return payloadCaixa.companies.reduce((s,c)=> s + (Number(c.saldoNaLoja)||0), 0);
+  }
+  const c = payloadCaixa.companies.find(x => normaliza(x.company) === normaliza(empresa));
+  return c ? (Number(c.saldoNaLoja)||0) : 0;
+}
+function normaliza(s){ return (s||'').toString().trim().toLowerCase().replace(/\s+/g,' '); }
 
-    function mountEmpresaOptions(){
-      const sel = document.getElementById('empresa');
-      sel.innerHTML = (raw.companies||[]).map(c=>`<option>${escapeHtml(c.company)}</option>`).join('');
-      sel.onchange = render;
-      document.getElementById('dtIni').onchange = render;
-      document.getElementById('dtFim').onchange = render;
-      document.getElementById('busca').oninput = render;
-    }
+async function renderSaldo(){
+  try{
+    await loadCaixa();
+    const empresa = $('#empresa').value;
+    const saldo = computeSaldo(empresa);
+    $('#kpi-saldo-caixa').textContent = fmtBRL.format(saldo);
+  }catch(e){
+    console.error('Saldo em caixa:', e);
+    $('#kpi-saldo-caixa').textContent = '—';
+  }
+}
 
-    function getFilters(){
-      return {
-        company: document.getElementById('empresa').value,
-        dtIni: document.getElementById('dtIni').value,
-        dtFim: document.getElementById('dtFim').value,
-        q: document.getElementById('busca').value.trim().toLowerCase()
-      };
-    }
+/* ========= ADAPTERS DEMO (mantidos) ========= */
+const adapters = {
+  metas: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}}),
+  cancel: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}}),
+  travas: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}}),
+  financeiro: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}}),
+  delivery: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}}),
+  conciliacao: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}}),
+  nps: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}}),
+  midias: async ()=>({kpi:'—', spark:demoSeries(), kpis:{a:'—',b:'—',c:'—',d:'—'}})
+};
+function demoSeries(){ return Array.from({length:12},()=>Math.round(100+Math.random()*300)); }
 
-    function applyFilters(f){
-      if (!raw) return [];
-      current = raw.companies.find(c=>c.company===f.company) || raw.companies[0];
-      if (!current) return [];
+/* ========= RENDER ========= */
+let chartLine, chartBar, sparks = {};
+function setLinks(){
+  $('#link-metas').dataset.href  = CONFIG.LINKS.METAS;
+  $('#link-cancel').dataset.href = CONFIG.LINKS.CANCELAMENTOS;
+  $('#link-travas').dataset.href = CONFIG.LINKS.TRAVAS;
+  $('#link-fin').dataset.href    = CONFIG.LINKS.FINANCEIRO;
+  $('#link-delivery').dataset.href = CONFIG.LINKS.DELIVERY;
+  $('#link-bank').dataset.href   = CONFIG.LINKS.CONCILIACAO;
+  $('#link-nps').dataset.href    = CONFIG.LINKS.PESQUISA;
+  $('#link-midias').dataset.href = CONFIG.LINKS.MIDIAS;
+}
+function renderModule(idKpi, idSpark, payload){
+  if(!payload) return;
+  $(idKpi).textContent = payload.kpi || '—';
+  if(payload.spark && payload.spark.length){ sparks[idSpark] = spark(idSpark, payload.spark); }
+}
+async function loadModules(){
+  const emp = $('#empresa').value;
+  const per = $('#periodo').value; // ainda usado para outros módulos e para o pop-up
+  const results = await Promise.allSettled([
+    adapters.metas(emp,per), adapters.cancel(emp,per), adapters.travas(emp,per),
+    adapters.financeiro(emp,per), adapters.delivery(emp,per),
+    adapters.conciliacao(emp,per), adapters.nps(emp,per), adapters.midias(emp,per)
+  ]);
+  const [m,c,t,f,d,b,n,mi] = results.map(r=>r.status==='fulfilled'?r.value:null);
+  if(m) renderModule('#kpi-metas','spark-metas', m);
+  if(c) renderModule('#kpi-cancel','spark-cancel', c);
+  if(t) renderModule('#kpi-travas','spark-travas', t);
+  if(f) renderModule('#kpi-fin','spark-fin', f);
+  if(d) renderModule('#kpi-delivery','spark-delivery', d);
+  if(b) renderModule('#kpi-bank','spark-bank', b);
+  if(n) renderModule('#kpi-nps','spark-nps', n);
+  if(mi) renderModule('#kpi-views','spark-views', mi);
+}
+function bootstrapCharts(){
+  chartLine = makeLine($('#line-timeline'));
+  chartBar  = makeBar($('#bar-days'));
+  chartLine.data.labels = ['S1','S2','S3','S4','S5','S6','S7'];
+  chartLine.data.datasets[0].data = [180,220,260,300,450,200,150];
+  chartLine.data.datasets[1].data = [60,120,180,250,380,150,90];
+  chartLine.update();
+  chartBar.data.labels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  chartBar.data.datasets[0].data = [16,8,11,16,9,8,7];
+  chartBar.update();
+}
 
-      const dtIni = f.dtIni ? new Date(f.dtIni) : null;
-      const dtFim = f.dtFim ? new Date(f.dtFim) : null;
+/* ========= POP‑UP (abrir com filtros do index) ========= */
+let popupWin = null;
+function currentFilters(){
+  const emp = $('#empresa').value;
+  // transforma input type=month em primeiro/último dia
+  const ym = $('#periodo').value; // yyyy-mm
+  let dtIni = '', dtFim = '';
+  if (ym){
+    const [y,m] = ym.split('-').map(Number);
+    const first = new Date(y, m-1, 1);
+    const last  = new Date(y, m, 0);
+    dtIni = first.toISOString().slice(0,10);
+    dtFim = last.toISOString().slice(0,10);
+  }
+  return { company: emp, dtIni, dtFim, q: '' };
+}
+function openPopup(){
+  const qs = new URLSearchParams(currentFilters()).toString();
+  const url = CONFIG.POPUP_URL + '?' + qs;
+  popupWin = window.open(url, 'popup_livro_caixa', 'width=1200,height=800,menubar=no,toolbar=no,location=no');
+}
+function syncFiltersToPopup(){
+  if (popupWin && !popupWin.closed){
+    popupWin.postMessage({ type:'livrocaixa-filters', payload: currentFilters() }, '*');
+  }
+}
 
-      const rows = (current.items||[]).filter(it=>{
-        let ok = true;
-        if (dtIni) ok = ok && it.data && new Date(it.data) >= dtIni;
-        if (dtFim) ok = ok && it.data && new Date(it.data) <= new Date(dtFim.getFullYear(), dtFim.getMonth(), dtFim.getDate(), 23,59,59);
-        if (f.q){
-          const text = (it.historico+' '+it.complemento).toLowerCase();
-          ok = ok && text.includes(f.q);
-        }
-        return ok;
-      });
-      return rows;
-    }
+/* ========= BOOTSTRAP ========= */
+function initDashboard(){
+  setLinks();
+  // período padrão: mês atual
+  $('#periodo').value = new Date().toISOString().slice(0,7);
+  $('#last-update').textContent = new Date().toLocaleString('pt-BR');
 
-    function render(){
-      const f = getFilters();
-      const rows = applyFilters(f);
+  bootstrapCharts();
+  loadModules();
+  renderSaldo();
 
-      const entradas = rows.reduce((s,r)=>s+(r.entrada||0),0);
-      const saidas   = rows.reduce((s,r)=>s+(r.saida||0),0);
-      const saldoPeriodo = (current?.saldoImplantacao||0) + entradas - saidas;
+  // filtros gerais
+  $('#btn-refresh').addEventListener('click', ()=>{ loadModules(); renderSaldo(); });
+  $('#empresa').addEventListener('change', ()=>{ loadModules(); renderSaldo(); syncFiltersToPopup(); });
+  $('#periodo').addEventListener('change', ()=>{ loadModules(); syncFiltersToPopup(); });
 
-      setKpi('kpi-saldo-impl', current?.saldoImplantacao||0, 'warn');
-      setKpi('kpi-entradas', entradas, 'ok');
-      setKpi('kpi-saidas',   saidas,   'bad');
-      setKpi('kpi-saldo',    saldoPeriodo, saldoPeriodo>=0?'ok':'bad');
+  // abrir pop-up manualmente ou ao clicar nos cards
+  $('#btn-popup').addEventListener('click', openPopup);
+  document.addEventListener('click', (e)=>{
+    const card = e.target.closest('.mod');
+    if(!card) return; e.preventDefault(); openPopup();
+  });
 
-      const tbody = document.querySelector('#tbl tbody');
-      tbody.innerHTML = rows.map(r=>`
-        <tr>
-          <td>${r.data?new Date(r.data).toLocaleDateString('pt-BR'):''}</td>
-          <td>${escapeHtml(r.historico||'')}</td>
-          <td>${escapeHtml(r.complemento||'')}</td>
-          <td class="right">${r.entrada?fmt.format(r.entrada):''}</td>
-          <td class="right">${r.saida?fmt.format(r.saida):''}</td>
-        </tr>
-      `).join('');
-      document.getElementById('empty').hidden = rows.length>0;
-      document.getElementById('ttl').textContent = `Livro de Caixa — ${current?.company||''}`;
-    }
+  // se o pop-up já estiver aberto, mantemos sincronizado
+  window.addEventListener('focus', syncFiltersToPopup);
+}
 
-    function setKpi(id,val,cls){
-      const el=document.getElementById(id);
-      el.classList.remove('ok','bad','warn');
-      if(cls) el.classList.add(cls);
-      el.querySelector('.value').textContent = fmt.format(val||0);
-    }
-
-    function escapeHtml(s){
-      return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
-    }
-
-    // ====== Sincronização com a janela principal via postMessage ======
-    // 1) Lê filtros passados por querystring (company, dtIni, dtFim, q)
-    function readQs(){
-      const p = new URLSearchParams(location.search);
-      const company = p.get('company');
-      const dtIni = p.get('dtIni');
-      const dtFim = p.get('dtFim');
-      const q = p.get('q');
-      if (company) document.getElementById('empresa').value = company;
-      if (dtIni) document.getElementById('dtIni').value = dtIni;
-      if (dtFim) document.getElementById('dtFim').value = dtFim;
-      if (q) document.getElementById('busca').value = decodeURIComponent(q);
-    }
-
-    // 2) Recebe atualizações do index.html
-    window.addEventListener('message', (evt)=>{
-      const { type, payload } = evt.data||{};
-      if (type === 'livrocaixa-filters'){
-        if (payload.company) document.getElementById('empresa').value = payload.company;
-        if (payload.dtIni) document.getElementById('dtIni').value = payload.dtIni;
-        if (payload.dtFim) document.getElementById('dtFim').value = payload.dtFim;
-        document.getElementById('busca').value = payload.q||'';
-        render();
-      }
-    });
-
-    // Inicializa
-    load().then(()=>{ readQs(); render(); }).catch(err=>{
-      alert('Erro ao carregar: '+err.message);
-      console.error(err);
-    });
-  </script>
+window.addEventListener('DOMContentLoaded', ()=>{ try{ initDashboard(); }catch(err){ console.error(err); } });
+</script>
 </body>
 </html>
